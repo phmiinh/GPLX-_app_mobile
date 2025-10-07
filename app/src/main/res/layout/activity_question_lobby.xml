@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+
+    android:orientation="vertical"
+    tools:context=".QuestionActivityLobby">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:orientation="horizontal"
+        >
+
+
+        <ImageButton
+            android:id="@+id/btnLobbyBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_null"
+            app:srcCompat="@android:drawable/ic_menu_revert" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Thông tin bộ câu hỏi"
+            android:textColor="@color/white"
+            android:textSize="22dp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtLobbyCategoriesName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:text="Quy định chung"
+        android:textColor="@color/white"
+        android:textSize="18dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_search"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView5"
+            android:paddingTop="20dp"
+            android:paddingHorizontal="20dp"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hướng dẫn" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="30dp">
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_sort_by_size" />
+
+            <TextView
+                android:id="@+id/txtLobbyNumofQues"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="30dp"
+                android:text="100 câu"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:text="Đầu tiên, nhập câu hỏi bắt đầu và kết thúc mà bạn muốn ôn tập." />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+
+            android:paddingHorizontal="30dp">
+
+            <EditText
+                android:id="@+id/txtLobbyStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:textSize="15dp"
+                android:inputType="number" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="30dp"
+                android:layout_height="5dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:scaleType="fitCenter"
+                app:srcCompat="@android:drawable/dialog_holo_dark_frame" />
+
+            <EditText
+                android:id="@+id/txtLobbyEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="15dp"
+                android:ems="10"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnLobbyChoseAll"
+            android:layout_width="178dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Chọn tất cả" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:padding="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tiếp theo, chọn hình thức ôn tập." />
+
+        <RadioGroup
+            android:id="@+id/rgLobby"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp">
+
+            <RadioButton
+                android:id="@+id/radioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Xem đáp án ngay lập tức" />
+
+            <RadioButton
+                android:id="@+id/radioButton2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Xem đáp án sau khi hoàn thành bài thi" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnLobbyStart"
+                android:layout_width="189dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Bắt đầu" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
