@@ -28,13 +28,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
-public class QuestionActivityLast extends AppCompatActivity {
+public class QuestionActivityNow extends AppCompatActivity {
     private TextView topicname;
     private ImageButton back;
-    private Button submit,next,prev;
+    private Button submit,next;
 
     private SQLiteDatabase database= null;
-    private TextView content;
+    private TextView content,explain,showans;
     private RadioButton a,b,c,d;
     private ImageView imgQuestion;
     private String ans="",explaination="",img_url="";
@@ -48,7 +48,7 @@ public class QuestionActivityLast extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_question_last);
+        setContentView(R.layout.activity_question_now);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -56,7 +56,7 @@ public class QuestionActivityLast extends AppCompatActivity {
         });
         Intent intent=getIntent();
         String topic=intent.getStringExtra("name");
-        topicname=findViewById(R.id.txtTopicQAL);
+        topicname=findViewById(R.id.txtTopicQAN);
         topicname.setText(topic);
         backSetup();
         start=intent.getIntExtra("start",1);
@@ -66,23 +66,24 @@ public class QuestionActivityLast extends AppCompatActivity {
     }
 
     private void setsql(int start,int end) {
-        content=findViewById(R.id.txtQALcontent);
-        a=findViewById(R.id.radiobtnQALa);
-        b=findViewById(R.id.radiobtnQALb);
-        c=findViewById(R.id.radiobtnQALc);
-        d=findViewById(R.id.radiobtnQALd);
-        next=findViewById(R.id.btnnextQAL);
-        prev=findViewById(R.id.btnprevQAL);
-        radioGroup=findViewById(R.id.radioBtnQAL);
-        imgQuestion=findViewById(R.id.imgQAL);
+        content=findViewById(R.id.txtQANcontent);
+        a=findViewById(R.id.radiobtnQANa);
+        b=findViewById(R.id.radiobtnQANb);
+        c=findViewById(R.id.radiobtnQANc);
+        d=findViewById(R.id.radiobtnQANd);
+        next=findViewById(R.id.btnnextQAN);
+        radioGroup=findViewById(R.id.radioBtnQAN);
+        imgQuestion=findViewById(R.id.imgQAN);
         hashMap=new HashMap<>();
         answer=new HashMap<>();
+        explain=findViewById(R.id.txtQANexplain);
         database=openOrCreateDatabase("ATGT3.db",MODE_PRIVATE,null);
-
+        showans=findViewById(R.id.txtQANans);
         count= DatabaseUtils.queryNumEntries(database,"Questions","question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)});
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull RadioGroup group, int checkedId) {
+                if(!next.getText().toString().equals("Kiểm tra")) return;
                 if (checkedId != -1) {
                     RadioButton selected = findViewById(checkedId);
                     if (selected != null) {
@@ -98,27 +99,31 @@ public class QuestionActivityLast extends AppCompatActivity {
             answer.put(1,ans);
         }
         else finish();
-        prev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(cursor.isFirst()) return;
-                else{
-                    cursor.moveToPrevious();
-                    anInt--;
-                    set_content(cursor);
-                    answer.put(anInt,ans);
-                }
-            }
-        });
+
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int id=radioGroup.getCheckedRadioButtonId();
+                if(id==-1){
+                    Toast.makeText(QuestionActivityNow.this, "Hãy chọn đáp án trước", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(next.getText().toString().equals("Kiểm tra")){
+                    showans.setText("Đáp án đúng là: "+ans);
+                    explain.setText("Giải thích: "+explaination);
+                    next.setText("Câu tiếp theo");
+                    return;
+                }
                 if(cursor.isLast()) return;
                 else{
+                    showans.setText("");
+                    explain.setText("");
+                    next.setText("Kiểm tra");
                     anInt++;
                     cursor.moveToNext();
                     set_content(cursor);
                     answer.put(anInt,ans);
+
                 }
             }
         });
@@ -159,27 +164,19 @@ public class QuestionActivityLast extends AppCompatActivity {
                 imgQuestion.setImageDrawable(drawable);
             }
             catch (IOException e){
-                Toast.makeText(QuestionActivityLast.this, "Không thể tải ảnh", Toast.LENGTH_SHORT).show();
+                Toast.makeText(QuestionActivityNow.this, "Không thể tải ảnh", Toast.LENGTH_SHORT).show();
             }
         }
-
-        String selected = hashMap.get(anInt);
-        if (selected != null) {
-            if (selected.equals(a.getText().toString())) a.setChecked(true);
-            else if (selected.equals(b.getText().toString())) b.setChecked(true);
-            else if (selected.equals(c.getText().toString())) c.setChecked(true);
-            else if (selected.equals(d.getText().toString())) d.setChecked(true);
-        }
-        else radioGroup.clearCheck();
+        radioGroup.clearCheck();
     }
 
 
     private void submitSetup() {
-        submit=findViewById(R.id.btnQAL_submit);
+        submit=findViewById(R.id.btnQAN_submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder= new AlertDialog.Builder(QuestionActivityLast.this);
+                AlertDialog.Builder builder= new AlertDialog.Builder(QuestionActivityNow.this);
                 builder.setTitle("Bạn chắc chắn muốn nộp bài chứ?");
                 builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
@@ -188,7 +185,7 @@ public class QuestionActivityLast extends AppCompatActivity {
                     }
 
                     private void showpoint() {
-                        AlertDialog.Builder builder1=new AlertDialog.Builder(QuestionActivityLast.this);
+                        AlertDialog.Builder builder1=new AlertDialog.Builder(QuestionActivityNow.this);
                         builder1.setTitle("Kết quả");
                         String msg="/"+count;
                         int truecnt=0;
@@ -222,11 +219,11 @@ public class QuestionActivityLast extends AppCompatActivity {
     }
 
     private void backSetup() {
-        back=findViewById(R.id.btnBackQAL);
+        back=findViewById(R.id.btnBackQAN);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder= new AlertDialog.Builder(QuestionActivityLast.this);
+                AlertDialog.Builder builder= new AlertDialog.Builder(QuestionActivityNow.this);
                 builder.setTitle("Bạn chắc chắn muốn thoát chứ?");
                 builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override

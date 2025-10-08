@@ -66,6 +66,15 @@ public class QuestionActivityLobby extends AppCompatActivity {
 
                         startActivity(nextIntent);
                     }
+                    else {
+                        Intent nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityNow.class);
+                        nextIntent.putExtra("start",l);
+                        nextIntent.putExtra("end",r);
+                        String name=intent.getStringExtra("name");
+                        nextIntent.putExtra("name",name);
+
+                        startActivity(nextIntent);
+                    }
                 }
             }
         });

@@ -18,6 +18,9 @@
             android:name=".QuestionActivityLast"
             android:exported="false" />
         <activity
+            android:name=".QuestionActivityNow"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
