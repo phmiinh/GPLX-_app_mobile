@@ -3,6 +3,7 @@ package com.example.afinal;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,14 +20,15 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class QuestionActivityLobby extends AppCompatActivity {
-    TextView name,num;
-    EditText start,end;
-    ImageButton back;
-    Button run,all;
-    int min,max;
-    RadioGroup radioGroup;
-    Intent intent;
-    int l,r;
+    private TextView name,num;
+    private EditText start,end;
+    private ImageButton back;
+    private Button run,all;
+    private int min,max;
+    private RadioGroup radioGroup;
+    private Intent intent;
+    private int l,r;
+    private String id;
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,18 +55,22 @@ public class QuestionActivityLobby extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!checklegit_start_end()){
+                    Log.d("DEBUG_TAG", "notlegit");
                     Toast.makeText(QuestionActivityLobby.this, "Vui lòng nhập bắt đầu và kết thúc hợp lệ", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     String s = getChoice();
                     if(s.equals("Xem đáp án sau khi hoàn thành bài thi")){
+
                         Intent nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityLast.class);
                         nextIntent.putExtra("start",l);
                         nextIntent.putExtra("end",r);
                         String name=intent.getStringExtra("name");
                         nextIntent.putExtra("name",name);
-
+                        nextIntent.putExtra("id",id);
                         startActivity(nextIntent);
+
+
                     }
                     else {
                         Intent nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityNow.class);
@@ -72,7 +78,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
                         nextIntent.putExtra("end",r);
                         String name=intent.getStringExtra("name");
                         nextIntent.putExtra("name",name);
-
+                        nextIntent.putExtra("id",id);
                         startActivity(nextIntent);
                     }
                 }
@@ -113,6 +119,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
         end=findViewById(R.id.txtLobbyEnd);
         min=intent.getIntExtra("start",1);
         max=intent.getIntExtra("end",1);
+        id=intent.getStringExtra("id");
         start.setHint("Tối thiểu: "+String.valueOf(min));
         end.setHint("Tối đa: "+String.valueOf(max));
     }

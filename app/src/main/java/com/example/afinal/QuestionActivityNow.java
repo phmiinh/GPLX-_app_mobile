@@ -3,7 +3,6 @@ package com.example.afinal;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -37,12 +36,12 @@ public class QuestionActivityNow extends AppCompatActivity {
     private TextView content,explain,showans;
     private RadioButton a,b,c,d;
     private ImageView imgQuestion;
-    private String ans="",explaination="",img_url="";
+    private String ans="",explaination="",img_url="",id;
     private RadioGroup radioGroup;
     private int anInt=1;
     private HashMap<Integer,String> hashMap;
     private HashMap<Integer,String> answer;
-    private long count;
+    private int count;
     private int start,end;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +57,30 @@ public class QuestionActivityNow extends AppCompatActivity {
         String topic=intent.getStringExtra("name");
         topicname=findViewById(R.id.txtTopicQAN);
         topicname.setText(topic);
+        database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         backSetup();
-        start=intent.getIntExtra("start",1);
-        end=intent.getIntExtra("end",1);
-        setsql(start,end);
+        id=intent.getStringExtra("id");
+        Cursor cursor=null;
+        if(id.equals("topic")){
+            start=intent.getIntExtra("start",1);
+            end=intent.getIntExtra("end",1);
+            count= end-start+1;
+            cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
+
+        }
+
+        setting(cursor);
         submitSetup();
+
     }
 
-    private void setsql(int start,int end) {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        database.close();
+    }
+
+    private void setting(Cursor cursor) {
         content=findViewById(R.id.txtQANcontent);
         a=findViewById(R.id.radiobtnQANa);
         b=findViewById(R.id.radiobtnQANb);
@@ -77,9 +92,8 @@ public class QuestionActivityNow extends AppCompatActivity {
         hashMap=new HashMap<>();
         answer=new HashMap<>();
         explain=findViewById(R.id.txtQANexplain);
-        database=openOrCreateDatabase("ATGT3.db",MODE_PRIVATE,null);
         showans=findViewById(R.id.txtQANans);
-        count= DatabaseUtils.queryNumEntries(database,"Questions","question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)});
+
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull RadioGroup group, int checkedId) {
@@ -93,7 +107,6 @@ public class QuestionActivityNow extends AppCompatActivity {
                 }
             }
         });
-        Cursor cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
         if(cursor.moveToFirst()){
             set_content(cursor);
             answer.put(1,ans);

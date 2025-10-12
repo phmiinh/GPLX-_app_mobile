@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private TabHost tabmain;
     private ListView lvTopic;
     private String DB_PATH_SUFFIX="/databases/";   // mặc định
-    private String DATABASE_NAME="ATGT3.db"; //tên file
+    private String DATABASE_NAME= "ATGT.db"; //tên file
     private ArrayList<Categories> list;
     private SQLiteDatabase database=null;
     @Override
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         processCopy();
-        database = openOrCreateDatabase("ATGT3.db",MODE_PRIVATE,null);
+        database = openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         tabmainsetup();
         tab_topic_setup();
 
@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("num",categories.getNum());
                 intent.putExtra("start",categories.getStart());
                 intent.putExtra("end",categories.getEnd());
+                intent.putExtra("id","topic");
                 startActivity(intent);
             }
         });
