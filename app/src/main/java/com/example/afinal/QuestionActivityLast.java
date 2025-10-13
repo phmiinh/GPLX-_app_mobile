@@ -111,7 +111,7 @@ public class QuestionActivityLast extends AppCompatActivity {
             answer.put(1,ans);
         }
         else {
-            Log.d("DEBUG_TAG", String.valueOf(start));
+            Log.d("DEBUG_TAG", "Can't find data");
             finish();
         }
         prev.setOnClickListener(new View.OnClickListener() {

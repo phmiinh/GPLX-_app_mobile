@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -103,11 +104,10 @@ public class MainActivity extends AppCompatActivity {
         if (!dbFile.exists())
         {
             try{CopyDataBaseFromAsset();
-                Toast.makeText(this, "Copying sucess from Assets folder",
-                        Toast.LENGTH_LONG).show();
+                Log.d( "copydata:", "processCopy: Copying sucess from Assets folder");
             }
             catch (Exception e){
-                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+                    Log.d( "copydata:", "processCopy: Copying fail from Assets folder");
             }
         }
     }
