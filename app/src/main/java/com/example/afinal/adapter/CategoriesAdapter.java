@@ -33,8 +33,8 @@ public class CategoriesAdapter extends ArrayAdapter<Categories> {
         LayoutInflater myflat=context.getLayoutInflater();
         convertView=myflat.inflate(idlayout,null);
         Categories categories=list.get(position);
-        TextView name=convertView.findViewById(R.id.txtTopic_name);
-        TextView num=convertView.findViewById(R.id.txtNum_question);
+        TextView name=convertView.findViewById(R.id.txtLLTtopic_name);
+        TextView num=convertView.findViewById(R.id.txtLLTnum_question);
         name.setText(categories.getName());
         num.setText("Số lượng câu hỏi: "+String.valueOf(categories.getNum()));
         return convertView;

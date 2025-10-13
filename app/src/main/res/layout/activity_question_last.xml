@@ -52,6 +52,7 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             >
 
             <LinearLayout
@@ -87,24 +88,25 @@
                         android:id="@+id/radiobtnQALa"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1. Phần mặt đường và lề đường. " />
+                        android:text="1" />
 
                     <RadioButton
                         android:id="@+id/radiobtnQALb"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="2. Phần đường xe chạy. " />
+                        android:text="1" />
 
                     <RadioButton
                         android:id="@+id/radiobtnQALc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="3. Khổ giới hạn của đường bộ là khoảng trống có kích thước giới hạn về chiều  rộng, chiều cao của đường bộ để các xe, bao gồm cả hàng hoá xếp trên xe đi qua  được an toàn và được xác định theo quy chuẩn, tiêu chuẩn kỹ thuật của đường bộ.  " />
+                        android:text="1" />
 
                     <RadioButton
                         android:id="@+id/radiobtnQALd"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:text="1" />
                 </RadioGroup>
 
             </LinearLayout>
@@ -112,10 +114,10 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
             android:gravity="bottom"
             android:orientation="horizontal"
-            android:background="@color/white"
             android:padding="20dp">
 
             <Button

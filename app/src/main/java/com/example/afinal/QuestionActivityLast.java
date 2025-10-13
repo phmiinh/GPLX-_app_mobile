@@ -3,10 +3,10 @@ package com.example.afinal;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -37,15 +37,19 @@ public class QuestionActivityLast extends AppCompatActivity {
     private TextView content;
     private RadioButton a,b,c,d;
     private ImageView imgQuestion;
-    private String ans="",explaination="",img_url="";
+    private String ans="",explaination="",img_url="",id;
     private RadioGroup radioGroup;
     private int anInt=1;
     private HashMap<Integer,String> hashMap;
     private HashMap<Integer,String> answer;
-    private long count;
-    private int start,end;
+    private int count;
+    private int start,end,level,min,time,total;
+    private  Intent intent;
+    private Cursor cursor=null;
+    private HashMap<Integer,Integer>rule;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_question_last);
@@ -54,18 +58,109 @@ public class QuestionActivityLast extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Intent intent=getIntent();
+        intent=getIntent();
+
         String topic=intent.getStringExtra("name");
+        database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         topicname=findViewById(R.id.txtTopicQAL);
         topicname.setText(topic);
         backSetup();
-        start=intent.getIntExtra("start",1);
-        end=intent.getIntExtra("end",1);
-        setsql(start,end);
+        id=intent.getStringExtra("id");
+
+        setCursor();
+        setting(cursor);
         submitSetup();
     }
 
-    private void setsql(int start,int end) {
+    private void setCursor() {
+        if(id.equals("topic")){
+            start=intent.getIntExtra("start",1);
+            end=intent.getIntExtra("end",1);
+            count= end-start+1;
+            cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
+
+        }
+        else{
+            level=intent.getIntExtra("level_id",1);
+            min=intent.getIntExtra("min",1);
+            count=intent.getIntExtra("total",1);
+
+            Log.d("TAG", "onClick: "+count);
+            time=intent.getIntExtra("time",1);
+            rule=new HashMap<>();
+            Cursor cursor1=database.query("rules_exam",null,"level_id=?",new String[]{String.valueOf(level)},null,null,null);
+            if(cursor1.moveToFirst()){
+                while (!cursor1.isAfterLast()){
+                    rule.put(cursor1.getInt(1),cursor1.getInt(2));
+                    cursor1.moveToNext();
+                }
+            }
+            String sql="SELECT * from(\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere is_critical=1\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit 1\n" +
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=1 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(1,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=2 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(2,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=3 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(3,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=4 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(4,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=5 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(5,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=6 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(6,1)+
+                    "\t)\n" +
+                    "\n" +
+                    ")\n" +
+                    "order by random()";
+            cursor=database.rawQuery(sql,null);
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        database.close();
+    }
+
+    private void setting(Cursor cursor) {
+
         content=findViewById(R.id.txtQALcontent);
         a=findViewById(R.id.radiobtnQALa);
         b=findViewById(R.id.radiobtnQALb);
@@ -77,9 +172,7 @@ public class QuestionActivityLast extends AppCompatActivity {
         imgQuestion=findViewById(R.id.imgQAL);
         hashMap=new HashMap<>();
         answer=new HashMap<>();
-        database=openOrCreateDatabase("ATGT3.db",MODE_PRIVATE,null);
 
-        count= DatabaseUtils.queryNumEntries(database,"Questions","question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)});
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull RadioGroup group, int checkedId) {
@@ -92,12 +185,15 @@ public class QuestionActivityLast extends AppCompatActivity {
                 }
             }
         });
-        Cursor cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
+
         if(cursor.moveToFirst()){
             set_content(cursor);
             answer.put(1,ans);
         }
-        else finish();
+        else {
+            Log.d("DEBUG_TAG", "Can't find data");
+            finish();
+        }
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
