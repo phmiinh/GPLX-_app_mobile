@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,8 +16,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.afinal.adapter.LevelAdapter;
 import com.example.afinal.dbclass.Categories;
 import com.example.afinal.adapter.CategoriesAdapter;
+import com.example.afinal.dbclass.Level;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,10 +30,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private TabHost tabmain;
-    private ListView lvTopic;
+    private ListView lvTopic,lvLevel;
     private String DB_PATH_SUFFIX="/databases/";   // mặc định
     private String DATABASE_NAME= "ATGT.db"; //tên file
     private ArrayList<Categories> list;
+    private ArrayList<Level> arrayList;
     private SQLiteDatabase database=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +46,43 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         processCopy();
         database = openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
+
         tabmainsetup();
         tab_topic_setup();
+        tab_level_setup();
+
+    }
+
+    private void tab_level_setup() {
+        arrayList=new ArrayList<>();
+        Cursor cursor = database.query("level",null,null,null,null,null,null);
+        if(cursor.moveToFirst()){
+            while (!cursor.isAfterLast()){
+                arrayList.add(new Level(cursor.getInt(0),cursor.getString(1),
+                        cursor.getInt(2),cursor.getInt(3),cursor.getInt(4)));
+                cursor.moveToNext();
+            }
+        }
+        lvLevel=findViewById(R.id.lvLevel);
+        LevelAdapter adapter=new LevelAdapter(MainActivity.this,R.layout.layout_listview_level,arrayList);
+        lvLevel.setAdapter(adapter);
+        lvLevel.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent=new Intent(MainActivity.this,QuestionActivityLobby.class);
+                Level level=arrayList.get(position);
+                intent.putExtra("id","level");
+                intent.putExtra("level_id",level.getLevel_id());
+                intent.putExtra("min",level.getMinRequired());
+                intent.putExtra("total",level.getTotalQuestion());
+                intent.putExtra("name",level.getName());
+                intent.putExtra("time",level.getTime());
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -103,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         File dbFile = getDatabasePath(DATABASE_NAME);
         if (!dbFile.exists())
         {
+
             try{CopyDataBaseFromAsset();
                 Log.d( "copydata:", "processCopy: Copying sucess from Assets folder");
             }
