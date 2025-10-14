@@ -113,7 +113,7 @@
                         android:textSize="16sp"
                         android:textColor="@color/text_primary"
                         android:padding="12dp"
-                        android:background="@drawable/answer_normal"
+                        android:background="@drawable/answer_state"
                         android:button="@null" />
 
                     <RadioButton
@@ -125,7 +125,7 @@
                         android:textSize="16sp"
                         android:textColor="@color/text_primary"
                         android:padding="12dp"
-                        android:background="@drawable/answer_normal"
+                        android:background="@drawable/answer_state"
                         android:button="@null" />
 
                     <RadioButton
@@ -137,7 +137,7 @@
                         android:textSize="16sp"
                         android:textColor="@color/text_primary"
                         android:padding="12dp"
-                        android:background="@drawable/answer_normal"
+                        android:background="@drawable/answer_state"
                         android:button="@null" />
 
                     <RadioButton
@@ -149,7 +149,7 @@
                         android:textSize="16sp"
                         android:textColor="@color/text_primary"
                         android:padding="12dp"
-                        android:background="@drawable/answer_normal"
+                        android:background="@drawable/answer_state"
                         android:button="@null" />
                 </RadioGroup>
 

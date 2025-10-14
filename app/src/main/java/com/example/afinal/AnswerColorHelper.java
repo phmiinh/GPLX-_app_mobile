@@ -67,19 +67,19 @@ public class AnswerColorHelper {
     
     public static void resetAnswerColors(RadioButton a, RadioButton b, RadioButton c, RadioButton d) {
         // Reset all radio buttons to normal state
-        a.setBackgroundResource(R.drawable.answer_normal);
+        a.setBackgroundResource(R.drawable.answer_state);
         a.setTextColor(a.getContext().getResources().getColor(R.color.text_primary));
         
-        b.setBackgroundResource(R.drawable.answer_normal);
+        b.setBackgroundResource(R.drawable.answer_state);
         b.setTextColor(b.getContext().getResources().getColor(R.color.text_primary));
         
         if (c.getVisibility() == View.VISIBLE) {
-            c.setBackgroundResource(R.drawable.answer_normal);
+            c.setBackgroundResource(R.drawable.answer_state);
             c.setTextColor(c.getContext().getResources().getColor(R.color.text_primary));
         }
         
         if (d.getVisibility() == View.VISIBLE) {
-            d.setBackgroundResource(R.drawable.answer_normal);
+            d.setBackgroundResource(R.drawable.answer_state);
             d.setTextColor(d.getContext().getResources().getColor(R.color.text_primary));
         }
     }
