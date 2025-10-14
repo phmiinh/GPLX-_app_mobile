@@ -9,135 +9,188 @@
     android:background="@drawable/bg_gradient"
     tools:context=".QuestionActivityLast">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="20dp">
+        android:padding="20dp"
+        android:paddingTop="40dp"
+        android:gravity="center_vertical">
 
         <ImageButton
             android:id="@+id/btnBackQAL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_null"
-            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/btn_icon"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:tint="@color/text_on_dark"
+            android:padding="12dp" />
 
         <TextView
             android:id="@+id/txtTopicQAL"
-            android:layout_width="128dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="tên chủ đề"
-            android:textColor="@color/white"
-            android:textSize="22dp"
-            android:textStyle="bold" />
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="Tên chủ đề"
+            android:textColor="@color/text_on_dark"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center" />
 
         <Button
             android:id="@+id/btnQAL_submit"
-            android:layout_width="30dp"
-            android:layout_height="38dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Nộp bài"
-
-            />
+            android:textSize="14sp"
+            android:background="@drawable/btn_secondary"
+            android:textColor="@color/text_on_dark"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
     </LinearLayout>
 
+    <!-- Question Content -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@drawable/bg_search"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp">
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            >
+            android:padding="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_search"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- Question Text -->
                 <TextView
                     android:id="@+id/txtQALcontent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="20dp"
-                    android:paddingVertical="10dp"
-                    android:text="Phần của đường bộ được sử dụng cho phương tiện giao thông đường  bộ đi lại là gì? "
-                    android:textSize="16sp" />
+                    android:text="Phần của đường bộ được sử dụng cho phương tiện giao thông đường bộ đi lại là gì?"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:lineSpacingExtra="4dp" />
 
+                <!-- Question Image -->
                 <ImageView
                     android:id="@+id/imgQAL"
                     android:layout_width="match_parent"
-                    android:layout_height="197dp"
-                    android:padding="10dp"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/card_background"
+                    android:scaleType="centerCrop"
+                    android:padding="8dp"
                     tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
+                <!-- Answer Options -->
                 <RadioGroup
                     android:id="@+id/radioBtnQAL"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="20dp">
+                    android:layout_height="wrap_content">
 
                     <RadioButton
                         android:id="@+id/radiobtnQALa"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1" />
+                        android:layout_marginBottom="12dp"
+                        android:text="1. Đáp án A"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary"
+                        android:padding="12dp"
+                        android:background="@drawable/answer_normal"
+                        android:button="@null" />
 
                     <RadioButton
                         android:id="@+id/radiobtnQALb"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1" />
+                        android:layout_marginBottom="12dp"
+                        android:text="2. Đáp án B"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary"
+                        android:padding="12dp"
+                        android:background="@drawable/answer_normal"
+                        android:button="@null" />
 
                     <RadioButton
                         android:id="@+id/radiobtnQALc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1" />
+                        android:layout_marginBottom="12dp"
+                        android:text="3. Đáp án C"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary"
+                        android:padding="12dp"
+                        android:background="@drawable/answer_normal"
+                        android:button="@null" />
 
                     <RadioButton
                         android:id="@+id/radiobtnQALd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1" />
+                        android:layout_marginBottom="12dp"
+                        android:text="4. Đáp án D"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary"
+                        android:padding="12dp"
+                        android:background="@drawable/answer_normal"
+                        android:button="@null" />
                 </RadioGroup>
 
             </LinearLayout>
         </ScrollView>
 
+        <!-- Bottom Navigation -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:gravity="bottom"
+            android:background="@color/card_background"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:padding="20dp">
+            android:padding="16dp">
 
             <Button
                 android:id="@+id/btnprevQAL"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Câu trước" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="1dp"
-                android:layout_weight="6"></View>
+                android:layout_marginEnd="8dp"
+                android:text="Câu trước"
+                android:textSize="16sp"
+                android:background="@drawable/btn_secondary"
+                android:textColor="@color/text_primary"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp" />
 
             <Button
                 android:id="@+id/btnnextQAL"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Câu sau" />
+                android:layout_marginStart="8dp"
+                android:text="Câu sau"
+                android:textSize="16sp"
+                android:background="@drawable/btn_primary"
+                android:textColor="@color/button_text"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp" />
         </LinearLayout>
 
     </LinearLayout>

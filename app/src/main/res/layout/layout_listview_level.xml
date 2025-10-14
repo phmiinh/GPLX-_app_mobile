@@ -1,29 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/bg_listtopic"
     android:orientation="vertical"
-    android:padding="15dp">
+    android:padding="16dp"
+    android:layout_margin="8dp"
+    android:elevation="2dp">
 
     <TextView
         android:id="@+id/txtLLLlevel_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="22dp"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
+        android:textColor="@color/text_primary"
         android:text="B" />
 
     <TextView
         android:id="@+id/txtLLLinfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
         android:text="Cần đúng ít nhất: 41/45" />
 
     <TextView
         android:id="@+id/txtLLLtime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="14sp"
+        android:textColor="@color/text_light"
         android:text="Thời gian: 20 phút" />
 </LinearLayout>

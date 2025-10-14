@@ -198,6 +198,7 @@ public class QuestionActivityNow extends AppCompatActivity {
                     return;
                 }
                 if(next.getText().toString().equals("Kiểm tra")){
+                    showAnswerWithColors();
                     showans.setText("Đáp án đúng là: "+ans);
                     explain.setText("Giải thích: "+explaination);
                     next.setText("Câu tiếp theo");
@@ -212,7 +213,7 @@ public class QuestionActivityNow extends AppCompatActivity {
                     cursor.moveToNext();
                     set_content(cursor);
                     answer.put(anInt,ans);
-
+                    resetAnswerColors();
                 }
             }
         });
@@ -257,8 +258,16 @@ public class QuestionActivityNow extends AppCompatActivity {
             }
         }
         radioGroup.clearCheck();
+        resetAnswerColors();
     }
 
+    private void showAnswerWithColors() {
+        AnswerColorHelper.showAnswerWithColors(a, b, c, d, radioGroup, ans);
+    }
+    
+    private void resetAnswerColors() {
+        AnswerColorHelper.resetAnswerColors(a, b, c, d);
+    }
 
     private void submitSetup() {
         submit=findViewById(R.id.btnQAN_submit);
