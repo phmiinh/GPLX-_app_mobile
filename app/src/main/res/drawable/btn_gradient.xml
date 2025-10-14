@@ -6,3 +6,5 @@
         android:angle="45"/>
     <corners android:radius="@dimen/corner_radius_medium"></corners>
 </shape>
+
+

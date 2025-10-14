@@ -4,3 +4,5 @@
     <corners android:radius="@dimen/corner_radius_medium"></corners>
     <stroke android:color="@color/answer_selected" android:width="2dp"></stroke>
 </shape>
+
+
