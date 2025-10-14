@@ -261,8 +261,5 @@ public class QuestionActivityLast extends AppCompatActivity {
                 alertDialog.show();
             }
         });
-
     }
-
-
 }
