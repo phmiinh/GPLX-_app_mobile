@@ -45,12 +45,13 @@
             <ImageButton
                 android:id="@+id/imageButton6"
                 android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/btn_icon"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_null"
                 android:layout_gravity="end"
-                android:padding="12dp"
                 android:src="@drawable/ic_user"
-                android:tint="@color/text_on_dark" />
+                android:scaleType="fitCenter"
+                />
+
         </LinearLayout>
 
         <!-- Welcome Text -->
