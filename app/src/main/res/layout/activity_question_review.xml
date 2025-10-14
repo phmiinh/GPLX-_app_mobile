@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".QuestionActivityReview">
+
+    <TextView
+        android:id="@+id/txtQARinfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Số câu đúng: ?/? \n Thời gian: ??:??" />
+
+    <ListView
+        android:id="@+id/lvQAR"
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+
+    <Button
+        android:id="@+id/btnQARback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xong" />
+</LinearLayout>
