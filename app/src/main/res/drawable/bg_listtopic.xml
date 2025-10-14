@@ -1,9 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <shape android:shape="rectangle" xmlns:android="http://schemas.android.com/apk/res/android">
     <gradient
-        android:startColor="#99DCFF"
-        android:endColor="#9AEFFF"
+        android:startColor="@color/card_background"
+        android:endColor="@color/card_background_dark"
         android:angle="45"/>
- <corners android:radius="20dp"></corners>
-    <padding android:left="20dp" android:bottom="10dp" android:right="20dp" android:top="10dp"></padding>
-    <stroke android:color="@color/white" android:width="10dp"></stroke>
+    <corners android:radius="16dp"></corners>
+    <stroke android:color="@color/light_gray" android:width="1dp"></stroke>
 </shape>

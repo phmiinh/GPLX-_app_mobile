@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -25,6 +26,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class QuestionActivityNow extends AppCompatActivity {
@@ -38,11 +40,14 @@ public class QuestionActivityNow extends AppCompatActivity {
     private ImageView imgQuestion;
     private String ans="",explaination="",img_url="",id;
     private RadioGroup radioGroup;
-    private int anInt=1;
     private HashMap<Integer,String> hashMap;
     private HashMap<Integer,String> answer;
     private int count;
-    private int start,end;
+    private int start,end,level,min,time,total,ques_id;
+    private  Intent intent;
+    private Cursor cursor=null;
+    private ArrayList<Integer> listofquestion=new ArrayList<>();
+    private HashMap<Integer,Integer>rule;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,14 +58,21 @@ public class QuestionActivityNow extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Intent intent=getIntent();
+        intent=getIntent();
         String topic=intent.getStringExtra("name");
         topicname=findViewById(R.id.txtTopicQAN);
-        topicname.setText(topic);
+        topicname.setText("Hạng "+topic);
         database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         backSetup();
         id=intent.getStringExtra("id");
-        Cursor cursor=null;
+        setcursor();
+
+        setting(cursor);
+        submitSetup();
+
+    }
+
+    private void setcursor() {
         if(id.equals("topic")){
             start=intent.getIntExtra("start",1);
             end=intent.getIntExtra("end",1);
@@ -68,10 +80,75 @@ public class QuestionActivityNow extends AppCompatActivity {
             cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
 
         }
+        else{
+            level=intent.getIntExtra("level_id",1);
+            min=intent.getIntExtra("min",1);
+            count=intent.getIntExtra("total",1);
 
-        setting(cursor);
-        submitSetup();
-
+            Log.d("TAG", "onClick: "+count);
+            time=intent.getIntExtra("time",1);
+            rule=new HashMap<>();
+            Cursor cursor1=database.query("rules_exam",null,"level_id=?",new String[]{String.valueOf(level)},null,null,null);
+            if(cursor1.moveToFirst()){
+                while (!cursor1.isAfterLast()){
+                    rule.put(cursor1.getInt(1),cursor1.getInt(2));
+                    cursor1.moveToNext();
+                }
+            }
+            String sql="SELECT * from(\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere is_critical=1\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit 1\n" +
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=1 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(1,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=2 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(2,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=3 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(3,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=4 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(4,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=5 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(5,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=6 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(6,1)+
+                    "\t)\n" +
+                    "\n" +
+                    ")\n" +
+                    "order by random()";
+            cursor=database.rawQuery(sql,null);
+        }
     }
 
     @Override
@@ -102,14 +179,14 @@ public class QuestionActivityNow extends AppCompatActivity {
                     RadioButton selected = findViewById(checkedId);
                     if (selected != null) {
                         String chosen = selected.getText().toString();
-                        hashMap.put(anInt, chosen);
+                        hashMap.put(ques_id, chosen);
                     }
                 }
             }
         });
         if(cursor.moveToFirst()){
             set_content(cursor);
-            answer.put(1,ans);
+            answer.put(ques_id,ans);
         }
         else finish();
 
@@ -122,6 +199,8 @@ public class QuestionActivityNow extends AppCompatActivity {
                     return;
                 }
                 if(next.getText().toString().equals("Kiểm tra")){
+                    // Highlight correct (green) and incorrect (red) answers
+                    AnswerColorHelper.showAnswerWithColors(a,b,c,d, radioGroup, ans);
                     showans.setText("Đáp án đúng là: "+ans);
                     explain.setText("Giải thích: "+explaination);
                     next.setText("Câu tiếp theo");
@@ -132,10 +211,9 @@ public class QuestionActivityNow extends AppCompatActivity {
                     showans.setText("");
                     explain.setText("");
                     next.setText("Kiểm tra");
-                    anInt++;
                     cursor.moveToNext();
                     set_content(cursor);
-                    answer.put(anInt,ans);
+                    answer.put(ques_id,ans);
 
                 }
             }
@@ -144,7 +222,8 @@ public class QuestionActivityNow extends AppCompatActivity {
     }
 
     private void set_content(Cursor cursor) {
-        content.setText("Câu "+cursor.getString(0)+": "+cursor.getString(2));
+        ques_id=cursor.getInt(0);
+        content.setText("Câu "+ques_id+": "+cursor.getString(2));
         a.setText(cursor.getString(6));
         b.setText(cursor.getString(7));
         c.setVisibility(View.VISIBLE);
@@ -181,9 +260,18 @@ public class QuestionActivityNow extends AppCompatActivity {
             }
         }
         radioGroup.clearCheck();
+        // Reset answer visuals to default for new question
+        AnswerColorHelper.resetAnswerColors(a,b,c,d);
     }
 
 
+    private  void getfullques(){
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()){
+            listofquestion.add(cursor.getInt(0));
+            cursor.moveToNext();
+        }
+    }
     private void submitSetup() {
         submit=findViewById(R.id.btnQAN_submit);
         submit.setOnClickListener(new View.OnClickListener() {
@@ -202,16 +290,27 @@ public class QuestionActivityNow extends AppCompatActivity {
                         builder1.setTitle("Kết quả");
                         String msg="/"+count;
                         int truecnt=0;
-                        for(int i=1;i<=count;i++){
-                            if(hashMap.getOrDefault(i," ").equals(answer.getOrDefault(i,"  " ))){
-                                truecnt++;
-                            }
+                        for(Integer q:hashMap.keySet()){
+                            if(hashMap.get(q).equals(answer.get(q))) truecnt++;
                         }
+
                         msg=String.valueOf(truecnt)+msg;
                         builder1.setMessage(msg);
-                        builder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        builder1.setNegativeButton("Thoát", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                        builder1.setPositiveButton("Xem lại bài làm", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent nextIntent=new Intent(QuestionActivityNow.this,QuestionActivityReview.class);
+                                getfullques();
+                                nextIntent.putExtra("choice",hashMap);
+                                nextIntent.putExtra("list",listofquestion);
+                                startActivity(nextIntent);
+
                                 finish();
                             }
                         });
@@ -225,6 +324,7 @@ public class QuestionActivityNow extends AppCompatActivity {
                         dialog.cancel();
                     }
                 });
+
                 AlertDialog alertDialog=builder.create();
                 alertDialog.show();
             }
@@ -257,6 +357,7 @@ public class QuestionActivityNow extends AppCompatActivity {
         });
 
     }
+
 
 
 }

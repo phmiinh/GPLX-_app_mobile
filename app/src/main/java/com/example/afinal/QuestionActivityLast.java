@@ -24,8 +24,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.afinal.dbclass.Question;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class QuestionActivityLast extends AppCompatActivity {
@@ -37,13 +40,16 @@ public class QuestionActivityLast extends AppCompatActivity {
     private TextView content;
     private RadioButton a,b,c,d;
     private ImageView imgQuestion;
-    private String ans="",explaination="",img_url="";
+    private String ans="",explaination="",img_url="",id;
     private RadioGroup radioGroup;
-    private int anInt=1;
+    private ArrayList<Integer> listofquestion=new ArrayList<>();
     private HashMap<Integer,String> hashMap;
     private HashMap<Integer,String> answer;
-    private long count;
-    private int start,end;
+    private int count;
+    private int start,end,level,min,time,total,ques_id;
+    private  Intent intent;
+    private Cursor cursor=null;
+    private HashMap<Integer,Integer>rule;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -55,22 +61,99 @@ public class QuestionActivityLast extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Intent intent=getIntent();
+        intent=getIntent();
 
         String topic=intent.getStringExtra("name");
-        topicname=findViewById(R.id.txtTopicQAL);
-        topicname.setText(topic);
-        backSetup();
         database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
-        start=intent.getIntExtra("start",1);
-        end=intent.getIntExtra("end",1);
-        count= end-start+1;
+        topicname=findViewById(R.id.txtTopicQAL);
+        topicname.setText("Hạng "+topic);
+        backSetup();
+        id=intent.getStringExtra("id");
 
-        Cursor cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
-
+        setCursor();
         setting(cursor);
         submitSetup();
     }
+
+    private void setCursor() {
+        if(id.equals("topic")){
+            start=intent.getIntExtra("start",1);
+            end=intent.getIntExtra("end",1);
+            count= end-start+1;
+            cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
+
+        }
+        else{
+            level=intent.getIntExtra("level_id",1);
+            min=intent.getIntExtra("min",1);
+            count=intent.getIntExtra("total",1);
+
+            Log.d("TAG", "onClick: "+count);
+            time=intent.getIntExtra("time",1);
+            rule=new HashMap<>();
+            Cursor cursor1=database.query("rules_exam",null,"level_id=?",new String[]{String.valueOf(level)},null,null,null);
+            if(cursor1.moveToFirst()){
+                while (!cursor1.isAfterLast()){
+                    rule.put(cursor1.getInt(1),cursor1.getInt(2));
+                    cursor1.moveToNext();
+                }
+            }
+            String sql="SELECT * from(\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere is_critical=1\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit 1\n" +
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=1 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(1,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=2 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(2,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=3 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(3,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=4 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(4,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=5 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(5,1)+
+                    "\t)\n" +
+                    "\tunion all\n" +
+                    "\tselect * from(\n" +
+                    "\t\tSELECT * from Questions\n" +
+                    "\t\twhere category_id=6 and is_critical=0\n" +
+                    "\t\torder by random()\n" +
+                    "\t\tlimit " + rule.getOrDefault(6,1)+
+                    "\t)\n" +
+                    "\n" +
+                    ")\n" +
+                    "order by random()";
+            cursor=database.rawQuery(sql,null);
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -100,7 +183,7 @@ public class QuestionActivityLast extends AppCompatActivity {
                     RadioButton selected = findViewById(checkedId);
                     if (selected != null) {
                         String chosen = selected.getText().toString();
-                        hashMap.put(anInt, chosen);
+                        hashMap.put(ques_id, chosen);
                     }
                 }
             }
@@ -108,10 +191,10 @@ public class QuestionActivityLast extends AppCompatActivity {
 
         if(cursor.moveToFirst()){
             set_content(cursor);
-            answer.put(1,ans);
+            answer.put(ques_id,ans);
         }
         else {
-            Log.d("DEBUG_TAG", String.valueOf(start));
+            Log.d("DEBUG_TAG", "Can't find data");
             finish();
         }
         prev.setOnClickListener(new View.OnClickListener() {
@@ -120,9 +203,8 @@ public class QuestionActivityLast extends AppCompatActivity {
                 if(cursor.isFirst()) return;
                 else{
                     cursor.moveToPrevious();
-                    anInt--;
                     set_content(cursor);
-                    answer.put(anInt,ans);
+                    answer.put(ques_id,ans);
                 }
             }
         });
@@ -131,10 +213,9 @@ public class QuestionActivityLast extends AppCompatActivity {
             public void onClick(View v) {
                 if(cursor.isLast()) return;
                 else{
-                    anInt++;
                     cursor.moveToNext();
                     set_content(cursor);
-                    answer.put(anInt,ans);
+                    answer.put(ques_id,ans);
                 }
             }
         });
@@ -142,7 +223,8 @@ public class QuestionActivityLast extends AppCompatActivity {
     }
 
     private void set_content(Cursor cursor) {
-        content.setText("Câu "+cursor.getString(0)+": "+cursor.getString(2));
+        ques_id=cursor.getInt(0);
+        content.setText("Câu "+ques_id+": "+cursor.getString(2));
         a.setText(cursor.getString(6));
         b.setText(cursor.getString(7));
         c.setVisibility(View.VISIBLE);
@@ -179,7 +261,10 @@ public class QuestionActivityLast extends AppCompatActivity {
             }
         }
 
-        String selected = hashMap.get(anInt);
+        // Reset answer visuals to default for new question
+        AnswerColorHelper.resetAnswerColors(a,b,c,d);
+
+        String selected = hashMap.get(ques_id);
         if (selected != null) {
             if (selected.equals(a.getText().toString())) a.setChecked(true);
             else if (selected.equals(b.getText().toString())) b.setChecked(true);
@@ -189,7 +274,13 @@ public class QuestionActivityLast extends AppCompatActivity {
         else radioGroup.clearCheck();
     }
 
-
+    private  void getfullques(){
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()){
+            listofquestion.add(cursor.getInt(0));
+            cursor.moveToNext();
+        }
+    }
     private void submitSetup() {
         submit=findViewById(R.id.btnQAL_submit);
         submit.setOnClickListener(new View.OnClickListener() {
@@ -208,16 +299,27 @@ public class QuestionActivityLast extends AppCompatActivity {
                         builder1.setTitle("Kết quả");
                         String msg="/"+count;
                         int truecnt=0;
-                        for(int i=1;i<=count;i++){
-                            if(hashMap.getOrDefault(i," ").equals(answer.getOrDefault(i,"  " ))){
-                                truecnt++;
-                            }
+                        for(Integer q:hashMap.keySet()){
+                            if(hashMap.get(q).equals(answer.get(q))) truecnt++;
                         }
+
                         msg=String.valueOf(truecnt)+msg;
                         builder1.setMessage(msg);
-                        builder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        builder1.setNegativeButton("Thoát", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                        builder1.setPositiveButton("Xem lại bài làm", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent nextIntent=new Intent(QuestionActivityLast.this,QuestionActivityReview.class);
+                                getfullques();
+                                nextIntent.putExtra("choice",hashMap);
+                                nextIntent.putExtra("list",listofquestion);
+                                startActivity(nextIntent);
+
                                 finish();
                             }
                         });
@@ -231,6 +333,7 @@ public class QuestionActivityLast extends AppCompatActivity {
                         dialog.cancel();
                     }
                 });
+
                 AlertDialog alertDialog=builder.create();
                 alertDialog.show();
             }
@@ -257,6 +360,7 @@ public class QuestionActivityLast extends AppCompatActivity {
                         dialog.cancel();
                     }
                 });
+
                 AlertDialog alertDialog=builder.create();
                 alertDialog.show();
             }
