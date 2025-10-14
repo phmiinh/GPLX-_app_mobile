@@ -69,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Hãy ôn tập ngay nào!"
+            android:text="Hãy trải nghiệm ngay nào!"
             android:textColor="@color/text_on_dark"
             android:textSize="24sp"
             android:textStyle="bold" />

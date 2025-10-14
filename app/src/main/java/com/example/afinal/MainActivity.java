@@ -127,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
         spec_level=tabmain.newTabSpec("level");
         spec_level.setContent(R.id.tab_level_main);
         spec_topic.setContent(R.id.tab_topic_main);
-        spec_topic.setIndicator("Theo chủ đề");
-        spec_level.setIndicator("Theo hạng");
+        spec_topic.setIndicator("Luyện tập");
+        spec_level.setIndicator("Thi thử");
         tabmain.addTab(spec_topic);
         tabmain.addTab(spec_level);
 
