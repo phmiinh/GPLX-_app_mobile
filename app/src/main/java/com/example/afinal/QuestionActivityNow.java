@@ -35,7 +35,7 @@ public class QuestionActivityNow extends AppCompatActivity {
     private Button submit,next;
 
     private SQLiteDatabase database= null;
-    private TextView content,explain,showans;
+    private TextView content,explain;
     private RadioButton a,b,c,d;
     private ImageView imgQuestion;
     private String ans="",explaination="",img_url="",id;
@@ -169,7 +169,6 @@ public class QuestionActivityNow extends AppCompatActivity {
         hashMap=new HashMap<>();
         answer=new HashMap<>();
         explain=findViewById(R.id.txtQANexplain);
-        showans=findViewById(R.id.txtQANans);
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -201,14 +200,12 @@ public class QuestionActivityNow extends AppCompatActivity {
                 if(next.getText().toString().equals("Kiểm tra")){
                     // Highlight correct (green) and incorrect (red) answers
                     AnswerColorHelper.showAnswerWithColors(a,b,c,d, radioGroup, ans);
-                    showans.setText("Đáp án đúng là: "+ans);
                     explain.setText("Giải thích: "+explaination);
                     next.setText("Câu tiếp theo");
                     return;
                 }
                 if(cursor.isLast()) return;
                 else{
-                    showans.setText("");
                     explain.setText("");
                     next.setText("Kiểm tra");
                     cursor.moveToNext();
