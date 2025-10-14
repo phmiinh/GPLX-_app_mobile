@@ -80,29 +80,29 @@ public class QuestionAdapter extends ArrayAdapter<Question> {
         String ans=question.getAnswer();
 
         if(ans.equals(question.getA())){
-            a.setBackground(context.getDrawable(R.drawable.bg_true));
+            a.setBackgroundResource(R.drawable.answer_correct);
         }
         else if(ans.equals(question.getB())){
-            b.setBackground(context.getDrawable(R.drawable.bg_true));
+            b.setBackgroundResource(R.drawable.answer_correct);
         }
         if(ans.equals(question.getC())){
-            c.setBackground(context.getDrawable(R.drawable.bg_true));
+            c.setBackgroundResource(R.drawable.answer_correct);
         }
         if(ans.equals(question.getD())){
-            d.setBackground(context.getDrawable(R.drawable.bg_true));
+            d.setBackgroundResource(R.drawable.answer_correct);
         }
         if(!ans.equals(question.getUserChoice())){
             if(question.getUserChoice().equals(question.getA())){
-                a.setBackground(context.getDrawable(R.drawable.bg_false));
+                a.setBackgroundResource(R.drawable.answer_incorrect);
             }
             else if(question.getUserChoice().equals(question.getB())){
-                b.setBackground(context.getDrawable(R.drawable.bg_false));
+                b.setBackgroundResource(R.drawable.answer_incorrect);
             }
             if(question.getUserChoice().equals(question.getC())){
-                c.setBackground(context.getDrawable(R.drawable.bg_false));
+                c.setBackgroundResource(R.drawable.answer_incorrect);
             }
             if(question.getUserChoice().equals(question.getD())){
-                d.setBackground(context.getDrawable(R.drawable.bg_false));
+                d.setBackgroundResource(R.drawable.answer_incorrect);
             }
         }
         return convertView;
