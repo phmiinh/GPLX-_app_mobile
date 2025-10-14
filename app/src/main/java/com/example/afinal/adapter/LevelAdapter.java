@@ -36,7 +36,7 @@ public class LevelAdapter extends ArrayAdapter<Level> {
         TextView name=convertView.findViewById(R.id.txtLLLlevel_name);
         TextView info=convertView.findViewById(R.id.txtLLLinfo);
         TextView time=convertView.findViewById(R.id.txtLLLtime);
-        name.setText(level.getName());
+        name.setText("Hạng "+level.getName());
         time.setText("Thời gian: "+level.getTime()+" phút.");
         info.setText("Cần đúng ít nhất: "+level.getMinRequired()+"/"+level.getTotalQuestion()+".");
         return convertView;

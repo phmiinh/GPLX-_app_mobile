@@ -143,7 +143,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
         info=findViewById(R.id.txtLobbyinfo);
         intent=getIntent();
         id=intent.getStringExtra("id");
-        name.setText(intent.getStringExtra("name"));
+        name.setText("Hạng "+intent.getStringExtra("name"));
         if(id.equals("topic")){
             num.setText(String.valueOf(intent.getIntExtra("num",1))+" câu");
             start=findViewById(R.id.txtLobbyStart);

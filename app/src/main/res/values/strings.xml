@@ -1,18 +1,18 @@
 <resources>
     <string name="app_name">GPLX - Ôn Thi Bằng Lái Xe</string>
-    
+
     <!-- Main Activity -->
     <string name="welcome_message">Xin chào</string>
     <string name="welcome_subtitle">Hãy ôn tập ngay nào!</string>
     <string name="search_hint">Tìm kiếm...</string>
-    
+
     <!-- Question Activities -->
     <string name="question_topic">Tên chủ đề</string>
     <string name="submit_answer">Nộp bài</string>
     <string name="check_answer">Kiểm tra</string>
     <string name="previous_question">Câu trước</string>
     <string name="next_question">Câu sau</string>
-    
+
     <!-- Lobby Activity -->
     <string name="question_info_title">Thông tin bộ câu hỏi</string>
     <string name="instructions_title">Hướng dẫn</string>
@@ -25,7 +25,7 @@
     <string name="show_answer_immediately">Xem đáp án ngay lập tức</string>
     <string name="show_answer_after_completion">Xem đáp án sau khi hoàn thành bài thi</string>
     <string name="start_practice">Bắt đầu</string>
-    
+
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Hủy</string>

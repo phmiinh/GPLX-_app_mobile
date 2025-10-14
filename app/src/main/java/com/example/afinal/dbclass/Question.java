@@ -1,22 +1,39 @@
 package com.example.afinal.dbclass;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 public class Question {
     private int id,topic_id,is_critical;
-    private String content,img_url,A,B,C,Answer;
+    private String content,img_url,explain,A,B,C,D,Answer,UserChoice;
 
     public Question() {
     }
 
-    public Question(int id, int topic_id, int is_critical, String content, String img_url, String a, String b, String c, String answer) {
+
+    public Question(int id, int topic_id, int is_critical, String content, String img_url, String explain, String a, String b, String c, String d, String answer, String userChoice) {
         this.id = id;
         this.topic_id = topic_id;
         this.is_critical = is_critical;
         this.content = content;
         this.img_url = img_url;
+        this.explain = explain;
         A = a;
         B = b;
         C = c;
+        D = d;
         Answer = answer;
+        UserChoice = userChoice;
+    }
+
+    public String getExplain() {
+        return explain;
+    }
+
+    public void setExplain(String explain) {
+        this.explain = explain;
     }
 
     public int getId() {
@@ -51,20 +68,20 @@ public class Question {
         this.content = content;
     }
 
-    public String getA() {
-        return A;
-    }
-
-    public void setA(String a) {
-        A = a;
-    }
-
     public String getImg_url() {
         return img_url;
     }
 
     public void setImg_url(String img_url) {
         this.img_url = img_url;
+    }
+
+    public String getA() {
+        return A;
+    }
+
+    public void setA(String a) {
+        A = a;
     }
 
     public String getB() {
@@ -83,6 +100,14 @@ public class Question {
         C = c;
     }
 
+    public String getD() {
+        return D;
+    }
+
+    public void setD(String d) {
+        D = d;
+    }
+
     public String getAnswer() {
         return Answer;
     }
@@ -91,4 +116,11 @@ public class Question {
         Answer = answer;
     }
 
+    public String getUserChoice() {
+        return UserChoice;
+    }
+
+    public void setUserChoice(String userChoice) {
+        UserChoice = userChoice;
+    }
 }
