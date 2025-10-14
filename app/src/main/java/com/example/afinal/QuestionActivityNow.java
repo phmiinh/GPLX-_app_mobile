@@ -199,6 +199,8 @@ public class QuestionActivityNow extends AppCompatActivity {
                     return;
                 }
                 if(next.getText().toString().equals("Kiểm tra")){
+                    // Highlight correct (green) and incorrect (red) answers
+                    AnswerColorHelper.showAnswerWithColors(a,b,c,d, radioGroup, ans);
                     showans.setText("Đáp án đúng là: "+ans);
                     explain.setText("Giải thích: "+explaination);
                     next.setText("Câu tiếp theo");
@@ -258,6 +260,8 @@ public class QuestionActivityNow extends AppCompatActivity {
             }
         }
         radioGroup.clearCheck();
+        // Reset answer visuals to default for new question
+        AnswerColorHelper.resetAnswerColors(a,b,c,d);
     }
 
 

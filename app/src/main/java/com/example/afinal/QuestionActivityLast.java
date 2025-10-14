@@ -261,6 +261,9 @@ public class QuestionActivityLast extends AppCompatActivity {
             }
         }
 
+        // Reset answer visuals to default for new question
+        AnswerColorHelper.resetAnswerColors(a,b,c,d);
+
         String selected = hashMap.get(ques_id);
         if (selected != null) {
             if (selected.equals(a.getText().toString())) a.setChecked(true);
