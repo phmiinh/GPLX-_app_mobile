@@ -61,7 +61,7 @@ public class QuestionActivityNow extends AppCompatActivity {
         intent=getIntent();
         String topic=intent.getStringExtra("name");
         topicname=findViewById(R.id.txtTopicQAN);
-        topicname.setText(topic);
+        topicname.setText("Hạng "+topic);
         database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         backSetup();
         id=intent.getStringExtra("id");
