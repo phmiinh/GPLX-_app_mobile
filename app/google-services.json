@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1097723048381",
+    "project_id": "gplx-app-mobile",
+    "storage_bucket": "gplx-app-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1097723048381:android:dc80bf9188651ad659a2d4",
+        "android_client_info": {
+          "package_name": "com.example.afinal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZ5oe6oGTlMR2W4ckDCbJOluf0VR3T9Jw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
