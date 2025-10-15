@@ -2,6 +2,7 @@ package com.example.afinal.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,17 +52,24 @@ public class QuestionAdapter extends ArrayAdapter<Question> {
         if(question.getC()==null) c.setVisibility(View.GONE);
         else {
             c.setVisibility(View.VISIBLE);
-            c.setText("C. "+question.getC());
+            c.setText(question.getC());
         }
         if(question.getD()==null) d.setVisibility(View.GONE);
         else {
             d.setVisibility(View.VISIBLE);
-            d.setText("D. "+question.getD());
+            d.setText(question.getD());
         }
-        a.setText("A. "+question.getA());
-        b.setText("B. "+question.getB());
+        a.setText(question.getA());
+        b.setText(question.getB());
         content.setText("Câu "+question.getId()+": "+question.getContent());
-        explain.setText("\n Giải thích: "+question.getExplain());
+        if(question.getIs_critical()==1){
+            content.setText("Câu "+question.getId()+"(câu điểm liệt)"+": "+question.getContent());
+            content.setTypeface(null, Typeface.BOLD_ITALIC);
+        }
+        else{
+            content.setTypeface(null, Typeface.BOLD);
+        }
+            explain.setText("\n Giải thích: "+question.getExplain());
         String img_url="";
         if(question.getImg_url()!=null){
             img.setVisibility(View.VISIBLE);
@@ -80,29 +88,29 @@ public class QuestionAdapter extends ArrayAdapter<Question> {
         String ans=question.getAnswer();
 
         if(ans.equals(question.getA())){
-            a.setBackground(context.getDrawable(R.drawable.bg_true));
+            a.setBackgroundResource(R.drawable.answer_correct);
         }
         else if(ans.equals(question.getB())){
-            b.setBackground(context.getDrawable(R.drawable.bg_true));
+            b.setBackgroundResource(R.drawable.answer_correct);
         }
         if(ans.equals(question.getC())){
-            c.setBackground(context.getDrawable(R.drawable.bg_true));
+            c.setBackgroundResource(R.drawable.answer_correct);
         }
         if(ans.equals(question.getD())){
-            d.setBackground(context.getDrawable(R.drawable.bg_true));
+            d.setBackgroundResource(R.drawable.answer_correct);
         }
         if(!ans.equals(question.getUserChoice())){
             if(question.getUserChoice().equals(question.getA())){
-                a.setBackground(context.getDrawable(R.drawable.bg_false));
+                a.setBackgroundResource(R.drawable.answer_incorrect);
             }
             else if(question.getUserChoice().equals(question.getB())){
-                b.setBackground(context.getDrawable(R.drawable.bg_false));
+                b.setBackgroundResource(R.drawable.answer_incorrect);
             }
             if(question.getUserChoice().equals(question.getC())){
-                c.setBackground(context.getDrawable(R.drawable.bg_false));
+                c.setBackgroundResource(R.drawable.answer_incorrect);
             }
             if(question.getUserChoice().equals(question.getD())){
-                d.setBackground(context.getDrawable(R.drawable.bg_false));
+                d.setBackgroundResource(R.drawable.answer_incorrect);
             }
         }
         return convertView;

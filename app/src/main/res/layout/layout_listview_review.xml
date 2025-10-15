@@ -11,6 +11,8 @@
         android:id="@+id/txtLLRcontent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="5dp"
+        android:paddingLeft="15dp"
         android:text="CC là gi?" />
 
     <ImageView
@@ -23,29 +25,39 @@
         android:id="@+id/txtLLRa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="5dp"
+        android:paddingLeft="15dp"
         android:text="Là Minh" />
 
     <TextView
         android:id="@+id/txtLLRb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="5dp"
+        android:paddingLeft="15dp"
         android:text="Là Phát" />
 
     <TextView
         android:id="@+id/txtLLRc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="5dp"
+        android:paddingLeft="15dp"
         android:text="Minh Gay" />
 
     <TextView
         android:id="@+id/txtLLRd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="5dp"
+        android:paddingLeft="15dp"
         android:text="Phát Gay" />
 
     <TextView
         android:id="@+id/txtLLRexplain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="5dp"
+        android:paddingLeft="15dp"
         android:text="Giải thích" />
 </LinearLayout>
