@@ -53,7 +53,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username">
+            android:hint="Tên đăng nhập">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_username_register"
@@ -81,7 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Password"
+            android:hint="Mật khẩu"
             app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -96,7 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Confirm Password"
+            android:hint="Xác thực mật khẩu"
             app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -112,7 +112,7 @@
             android:layout_height="60dp"
             android:layout_marginTop="24dp"
             android:backgroundTint="@color/teal_primary"
-            android:text="REGISTER"
+            android:text="Đăng kí"
             app:cornerRadius="8dp" />
 
         <LinearLayout
@@ -125,14 +125,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Already have an account? "
+                android:text="Đã có tài khoản chưa? "
                 android:textColor="@color/text_secondary" />
 
             <TextView
                 android:id="@+id/tv_login_now"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Login"
+                android:text="Đăng nhập"
                 android:textColor="@color/text_link"
                 android:textStyle="bold" />
         </LinearLayout>
