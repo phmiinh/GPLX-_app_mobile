@@ -66,9 +66,11 @@ public class QuestionActivityLast extends AppCompatActivity {
         String topic=intent.getStringExtra("name");
         database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         topicname=findViewById(R.id.txtTopicQAL);
-        topicname.setText("Hạng "+topic);
-        backSetup();
         id=intent.getStringExtra("id");
+        if(id.equals("level")) topicname.setText("Hạng "+topic);
+        else topicname.setText(topic);
+        backSetup();
+
 
         setCursor();
         setting(cursor);
@@ -185,6 +187,7 @@ public class QuestionActivityLast extends AppCompatActivity {
                         String chosen = selected.getText().toString();
                         hashMap.put(ques_id, chosen);
                     }
+
                 }
             }
         });
@@ -272,7 +275,10 @@ public class QuestionActivityLast extends AppCompatActivity {
             else if (selected.equals(c.getText().toString())) c.setChecked(true);
             else if (selected.equals(d.getText().toString())) d.setChecked(true);
         }
-        else radioGroup.clearCheck();
+        else {
+            radioGroup.clearCheck();
+            hashMap.remove(ques_id);
+        }
     }
 
     private  void getfullques(){

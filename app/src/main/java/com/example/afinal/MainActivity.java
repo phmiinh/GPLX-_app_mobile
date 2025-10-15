@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void processCopy() {
-//private app
+
         File dbFile = getDatabasePath(DATABASE_NAME);
         if (!dbFile.exists())
         {
@@ -151,30 +151,23 @@ public class MainActivity extends AppCompatActivity {
         return getApplicationInfo().dataDir + DB_PATH_SUFFIX+ DATABASE_NAME;
     }
     public void CopyDataBaseFromAsset() {
-// TODO Auto-generated method stub
+
         try {
             InputStream myInput;
             myInput = getAssets().open(DATABASE_NAME);
-// Path to the just created empty db
             String outFileName = getDatabasePath();
-// if the path doesn't exist first, create it
             File f = new File(getApplicationInfo().dataDir + DB_PATH_SUFFIX);
             if (!f.exists())
                 f.mkdir();
-// Open the empty db as the output stream
             OutputStream myOutput = new FileOutputStream(outFileName);
-// transfer bytes from the inputfile to the outputfile
-// Truyền bytes dữ liệu từ input đến output
             int size = myInput.available();
             byte[] buffer = new byte[size];
             myInput.read(buffer);
             myOutput.write(buffer);
-// Close the streams
             myOutput.flush();
             myOutput.close();
             myInput.close();
         } catch (IOException e) {
-//TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

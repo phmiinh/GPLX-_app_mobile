@@ -143,8 +143,9 @@ public class QuestionActivityLobby extends AppCompatActivity {
         info=findViewById(R.id.txtLobbyinfo);
         intent=getIntent();
         id=intent.getStringExtra("id");
-        name.setText("Hạng "+intent.getStringExtra("name"));
+
         if(id.equals("topic")){
+            name.setText(intent.getStringExtra("name"));
             num.setText(String.valueOf(intent.getIntExtra("num",1))+" câu");
             start=findViewById(R.id.txtLobbyStart);
             end=findViewById(R.id.txtLobbyEnd);
@@ -156,6 +157,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
             info.setText("Đầu tiên, nhập câu hỏi bắt đầu và kết thúc mà bạn muốn ôn tập.");
         }
         else{
+            name.setText("Hạng "+intent.getStringExtra("name"));
             min=intent.getIntExtra("min",1);
             time=intent.getIntExtra("time",1);
             total=intent.getIntExtra("total",1);

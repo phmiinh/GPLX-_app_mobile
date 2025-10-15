@@ -61,10 +61,12 @@ public class QuestionActivityNow extends AppCompatActivity {
         intent=getIntent();
         String topic=intent.getStringExtra("name");
         topicname=findViewById(R.id.txtTopicQAN);
-        topicname.setText("Hạng "+topic);
+        id=intent.getStringExtra("id");
+        if(id.equals("level")) topicname.setText("Hạng "+topic);
+        else topicname.setText(topic);
         database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         backSetup();
-        id=intent.getStringExtra("id");
+
         setcursor();
 
         setting(cursor);
@@ -258,6 +260,7 @@ public class QuestionActivityNow extends AppCompatActivity {
             }
         }
         radioGroup.clearCheck();
+        hashMap.remove(ques_id);
         // Reset answer visuals to default for new question
         AnswerColorHelper.resetAnswerColors(a,b,c,d);
     }

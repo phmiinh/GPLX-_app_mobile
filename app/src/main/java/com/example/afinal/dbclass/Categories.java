@@ -1,5 +1,4 @@
 package com.example.afinal.dbclass;
-
 public class Categories {
     private int id;
     private String name;
