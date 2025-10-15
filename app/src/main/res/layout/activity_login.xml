@@ -70,7 +70,7 @@
                 android:layout_marginTop="16dp"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:passwordToggleEnabled="true"
-                android:hint="Password">
+                android:hint="Mật khẩu">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_password" android:layout_width="match_parent"
@@ -83,14 +83,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginTop="8dp"
-                android:text="Forgot Password?"
+                android:text="Quên mật khẩu?"
                 android:textColor="@color/text_link" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_login" android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="24dp"
-                android:text="LOGIN"
+                android:text="Đăng nhập"
                 android:backgroundTint="@color/teal_primary"
                 app:cornerRadius="8dp"/>
 
@@ -104,13 +104,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Don't have account? "
+                    android:text="Chưa có tài khoản? "
                     android:textColor="@color/text_secondary"/>
 
                 <TextView
                     android:id="@+id/tv_create_account" android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Create a new account"
+                    android:text="Tạo tài khoản mới"
                     android:textColor="@color/text_link"
                     android:textStyle="bold" />
             </LinearLayout>
