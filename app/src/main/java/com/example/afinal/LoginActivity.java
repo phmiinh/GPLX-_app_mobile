@@ -7,11 +7,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.widget.Button;
-import android.widget.EditText; // <-- Thêm import này
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog; // <-- Thêm import này
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputLayout layoutPassword;
     private Button btnLogin;
     private TextView tvCreateAccount;
-    private TextView tvForgotPassword; // <-- 1. Khai báo biến mới
+    private TextView tvForgotPassword;
 
     private SharedPreferences prefs;
     private int failedAttempts = 0;
@@ -50,14 +50,14 @@ public class LoginActivity extends AppCompatActivity {
         layoutEmail = findViewById(R.id.layout_email);
         layoutPassword = findViewById(R.id.layout_password);
         tvCreateAccount = findViewById(R.id.tv_create_account);
-        tvForgotPassword = findViewById(R.id.tv_forgot_password); // <-- 2. Ánh xạ View
+        tvForgotPassword = findViewById(R.id.tv_forgot_password);
 
         tvCreateAccount.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
 
-        // 3. Thiết lập sự kiện click cho "Forgot Password?"
+
         tvForgotPassword.setOnClickListener(v -> {
             showForgotPasswordDialog();
         });
@@ -67,27 +67,25 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> validateAndLogin());
     }
 
-    // --- BẮT ĐẦU PHẦN CODE MỚI ---
 
-    // 4. Hàm hiển thị hộp thoại quên mật khẩu
     private void showForgotPasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Reset Password");
         builder.setMessage("Enter your email to receive a password reset link.");
 
-        // Tạo một EditText để người dùng nhập email
+
         final EditText inputEmail = new EditText(this);
         inputEmail.setHint("Email");
         builder.setView(inputEmail);
 
-        // Thiết lập nút "Send"
+
         builder.setPositiveButton("Send", (dialog, which) -> {
             String email = inputEmail.getText().toString().trim();
             if (TextUtils.isEmpty(email)) {
                 Toast.makeText(LoginActivity.this, "Please enter your email", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Thêm kiểm tra định dạng email
+
             if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 Toast.makeText(LoginActivity.this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
                 return;
@@ -95,13 +93,13 @@ public class LoginActivity extends AppCompatActivity {
             sendPasswordResetEmail(email);
         });
 
-        // Thiết lập nút "Cancel"
+
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
     }
 
-    // 5. Hàm gửi yêu cầu reset mật khẩu đến Firebase
+
     private void sendPasswordResetEmail(String email) {
         mAuth.sendPasswordResetEmail(email)
                 .addOnCompleteListener(task -> {
@@ -113,10 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    // --- KẾT THÚC PHẦN CODE MỚI ---
 
-
-    // ... các hàm còn lại (validateAndLogin, checkLockoutStatus, etc.) không thay đổi ...
     private void validateAndLogin() {
         layoutEmail.setError(null);
         layoutPassword.setError(null);
