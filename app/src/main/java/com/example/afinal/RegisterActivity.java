@@ -20,17 +20,17 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister;
     private TextView tvLoginNow;
 
-    private FirebaseAuth mAuth; // <-- Khai báo biến Firebase Auth
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Khởi tạo Firebase Auth
+
         mAuth = FirebaseAuth.getInstance();
 
-        // Ánh xạ các View từ layout XML
+
         etUsername = findViewById(R.id.et_username_register);
         etEmail = findViewById(R.id.et_email_register);
         etPassword = findViewById(R.id.et_password_register);
@@ -38,10 +38,10 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btn_register);
         tvLoginNow = findViewById(R.id.tv_login_now);
 
-        // Xử lý sự kiện khi nhấn nút "REGISTER"
+
         btnRegister.setOnClickListener(v -> handleRegister());
 
-        // Xử lý sự kiện khi nhấn vào chữ "Login"
+
         tvLoginNow.setOnClickListener(v -> {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
@@ -50,13 +50,11 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void handleRegister() {
-        // Lấy dữ liệu từ các ô nhập liệu
         String username = etUsername.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        // **Phần Validate giữ nguyên vì đã làm rất tốt**
         if (TextUtils.isEmpty(username)) {
             etUsername.setError("Tên đăng nhập không được để trống");
             etUsername.requestFocus();
@@ -93,23 +91,18 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // --- Bắt đầu phần thay đổi ---
-        // Sử dụng Firebase để tạo người dùng mới bằng email và mật khẩu
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Nếu Firebase trả về thành công
                         Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
                     } else {
-                        // Nếu Firebase trả về lỗi
                         String errorMessage = task.getException() != null ? task.getException().getMessage() : "Lỗi không xác định";
                         Toast.makeText(RegisterActivity.this, "Đăng ký thất bại: " + errorMessage, Toast.LENGTH_LONG).show();
                         Log.e("FirebaseError", "Lỗi đăng ký: ", task.getException());
                     }
                 });
-        // --- Kết thúc phần thay đổi ---
     }
 }
