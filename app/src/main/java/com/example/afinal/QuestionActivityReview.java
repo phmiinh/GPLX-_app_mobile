@@ -69,6 +69,7 @@ public class QuestionActivityReview extends AppCompatActivity {
             x.setC(cursor.getString(8));
             x.setD(cursor.getString(9));
             x.setAnswer(cursor.getString(10));
+            x.setIs_critical(cursor.getInt(4));
             x.setUserChoice(choice.getOrDefault(i,"0"));
             list.add(x);
         }

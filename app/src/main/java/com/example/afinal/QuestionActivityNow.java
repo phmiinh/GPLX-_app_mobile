@@ -38,12 +38,12 @@ public class QuestionActivityNow extends AppCompatActivity {
     private TextView content,explain;
     private RadioButton a,b,c,d;
     private ImageView imgQuestion;
-    private String ans="",explaination="",img_url="",id;
+    private String ans="",explaination="",img_url="",id,state="Trượt";
     private RadioGroup radioGroup;
     private HashMap<Integer,String> hashMap;
     private HashMap<Integer,String> answer;
     private int count;
-    private int start,end,level,min,time,total,ques_id;
+    private int start,end,level,min,time,total,ques_id,critical=0;
     private  Intent intent;
     private Cursor cursor=null;
     private ArrayList<Integer> listofquestion=new ArrayList<>();
@@ -229,6 +229,7 @@ public class QuestionActivityNow extends AppCompatActivity {
         ansc=cursor.getString(8);
         ansd=cursor.getString(9);
         ans=cursor.getString(10);
+        if(cursor.getInt(4)==1) critical=ques_id;
         if(ansc==null){
             c.setVisibility(View.GONE);
         }
@@ -288,10 +289,21 @@ public class QuestionActivityNow extends AppCompatActivity {
                         String msg="/"+count;
                         int truecnt=0;
                         for(Integer q:hashMap.keySet()){
-                            if(hashMap.get(q).equals(answer.get(q))) truecnt++;
+                            if(hashMap.get(q).equals(answer.get(q))) {
+                                truecnt++;
+                                if(q==critical){
+                                    state="Đỗ";
+                                }
+                            }
                         }
 
                         msg=String.valueOf(truecnt)+msg;
+                        if(id.equals("level")){
+                            msg+="\n";
+                            msg+="Trạng thái: ";
+                            if(truecnt<min) state="Trượt";
+                            msg+=state;
+                        }
                         builder1.setMessage(msg);
                         builder1.setNegativeButton("Thoát", new DialogInterface.OnClickListener() {
                             @Override
