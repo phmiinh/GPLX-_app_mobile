@@ -21,7 +21,7 @@ public class GeminiApiInstrumentedTest {
     @Test
     public void callGemini_generateExplanation() throws Exception {
         GeminiApiManager manager = new GeminiApiManager();
-        String prompt = "Hãy giải thích ngắn gọn ý nghĩa của biển báo cấm dừng xe.";
+        String prompt = "Donald Trump sinh ngày nào";
         String response = safeCall(manager, prompt);
         Log.i(TAG, "Response:\n" + response);
         // Not asserting content, just ensure call returns non-empty when key is set
