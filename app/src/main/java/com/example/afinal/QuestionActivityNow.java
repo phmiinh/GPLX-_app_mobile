@@ -43,7 +43,7 @@ public class QuestionActivityNow extends AppCompatActivity {
     private HashMap<Integer,String> hashMap;
     private HashMap<Integer,String> answer;
     private int count;
-    private int start,end,level,min,time,total,ques_id,critical=0;
+    private int start,end,level,min,time,total,ques_id,critical=0,topicid;
     private  Intent intent;
     private Cursor cursor=null;
     private ArrayList<Integer> listofquestion=new ArrayList<>();
@@ -79,8 +79,14 @@ public class QuestionActivityNow extends AppCompatActivity {
             start=intent.getIntExtra("start",1);
             end=intent.getIntExtra("end",1);
             count= end-start+1;
-            cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
-
+            topicid=intent.getIntExtra("categories_id",0);
+            Log.d("con cac", "topicid: "+topicid);
+            if(topicid<7){
+                cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
+            }
+            else{
+                cursor = database.query("Questions",null,"is_critical=?",new String[]{"1"},null,null,"question_id asc",String.valueOf(end));
+            }
         }
         else{
             level=intent.getIntExtra("level_id",1);
@@ -186,6 +192,14 @@ public class QuestionActivityNow extends AppCompatActivity {
             }
         });
         if(cursor.moveToFirst()){
+            int cnt=1;
+            if(id.equals("topic")&&topicid==7){
+                while(true){
+                    if(cnt==start) break;
+                    cnt++;
+                    cursor.moveToNext();
+                }
+            }
             set_content(cursor);
             answer.put(ques_id,ans);
         }
@@ -268,6 +282,14 @@ public class QuestionActivityNow extends AppCompatActivity {
 
     private  void getfullques(){
         cursor.moveToFirst();
+        if(id.equals("topic")&&topicid==7){
+            int cnt=1;
+            while(true){
+                if(cnt==start) break;
+                cnt++;
+                cursor.moveToNext();
+            }
+        }
         while(!cursor.isAfterLast()){
             listofquestion.add(cursor.getInt(0));
             cursor.moveToNext();

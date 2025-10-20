@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-
+        list.add(new Categories(7,"Câu hỏi điểm liệt",60,1,60));
         //View tabView = findViewById(R.id.tab_topic_main);
         lvTopic = findViewById(R.id.lv_topic);
         CategoriesAdapter adapter=new CategoriesAdapter(MainActivity.this,R.layout.layout_listview_topic,list);

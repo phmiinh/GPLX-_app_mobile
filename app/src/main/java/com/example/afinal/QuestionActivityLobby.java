@@ -28,7 +28,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
     private int min,max;
     private RadioGroup radioGroup;
     private Intent intent;
-    private int l,r,total,level_id,time;
+    private int l,r,total,level_id,time,topicid;
     private String id;
     private LinearLayout choice;
     @SuppressLint("WrongViewCast")
@@ -72,6 +72,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
                         String name=intent.getStringExtra("name");
                         nextIntent.putExtra("name",name);
                         nextIntent.putExtra("id",id);
+                        nextIntent.putExtra("categories_id",topicid);
                         if(id.equals("topic")){
                             nextIntent.putExtra("start",l);
                             nextIntent.putExtra("end",r);
@@ -93,6 +94,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
                         String name=intent.getStringExtra("name");
                         nextIntent.putExtra("name",name);
                         nextIntent.putExtra("id",id);
+                        nextIntent.putExtra("categories_id",topicid);
                         if(id.equals("topic")){
                             nextIntent.putExtra("start",l);
                             nextIntent.putExtra("end",r);
@@ -143,7 +145,8 @@ public class QuestionActivityLobby extends AppCompatActivity {
         info=findViewById(R.id.txtLobbyinfo);
         intent=getIntent();
         id=intent.getStringExtra("id");
-
+        topicid=intent.getIntExtra("categories_id",0);
+        Log.d("con cac", "topicidlobby: "+topicid);
         if(id.equals("topic")){
             name.setText(intent.getStringExtra("name"));
             num.setText(String.valueOf(intent.getIntExtra("num",1))+" câu");
