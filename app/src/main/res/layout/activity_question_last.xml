@@ -40,6 +40,15 @@
             android:textStyle="bold"
             android:gravity="center" />
 
+        <ImageView
+            android:id="@+id/iv_bookmark_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"   android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Lưu câu hỏi"
+            android:padding="8dp"             android:src="@drawable/ic_bookmark_border"
+            app:tint="@color/text_on_dark" />
+
         <Button
             android:id="@+id/btnQAL_submit"
             android:layout_width="wrap_content"
@@ -52,6 +61,7 @@
             android:paddingEnd="16dp"
             android:paddingTop="8dp"
             android:paddingBottom="8dp" />
+
     </LinearLayout>
 
     <!-- Question Content -->
