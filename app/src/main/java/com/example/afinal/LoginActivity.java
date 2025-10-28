@@ -1,6 +1,5 @@
 package com.example.afinal;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -31,6 +30,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvCreateAccount;
     private TextView tvForgotPassword;
 
+    private Button btnSkip;
+
     private SharedPreferences prefs;
     private int failedAttempts = 0;
     private FirebaseAuth mAuth;
@@ -51,6 +52,9 @@ public class LoginActivity extends AppCompatActivity {
         layoutPassword = findViewById(R.id.layout_password);
         tvCreateAccount = findViewById(R.id.tv_create_account);
         tvForgotPassword = findViewById(R.id.tv_forgot_password);
+        btnSkip = findViewById(R.id.btnskip);
+
+
 
         tvCreateAccount.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
@@ -62,6 +66,11 @@ public class LoginActivity extends AppCompatActivity {
             showForgotPasswordDialog();
         });
 
+        btnSkip.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
 
         checkLockoutStatus();
         btnLogin.setOnClickListener(v -> validateAndLogin());
@@ -119,14 +128,19 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
         if (TextUtils.isEmpty(email)) {
             layoutEmail.setError("Email không được để trống");
+            etEmail.requestFocus();
             return;
         }
-        if (TextUtils.isEmpty(password)) {
-            layoutPassword.setError("Mật khẩu không được để trống");
-            return;
-        }
-        if (password.length() < 6) {
-            layoutPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
+        if (TextUtils.isEmpty(password) || !isValidPassword(password)) {
+            String message = "";
+            if(TextUtils.isEmpty(password)) {
+                message = "Mật khẩu không được để trống";
+            }
+            if(!isValidPassword(password)) {
+                message = "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ cái, số và ký tự đặc biệt";
+            }
+            layoutPassword.setError(message);
+            etPassword.requestFocus();
             return;
         }
         mAuth.signInWithEmailAndPassword(email, password)
@@ -143,6 +157,31 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private boolean isValidPassword(String password) {
+        if (password.length() < 6) {
+            return false;
+        }
+
+        Boolean hasLetter = false;
+        Boolean hasDigit = false;
+        Boolean hasSpecialChar = false;
+
+        for (char c : password.toCharArray()) {
+            if (Character.isLetter(c)) {
+                hasLetter = true;
+            } else if (Character.isDigit(c)) {
+                hasDigit = true;
+            } else hasSpecialChar = true;
+
+            if (hasLetter && hasDigit && hasSpecialChar) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     private void checkLockoutStatus() {
         long lockoutTimestamp = prefs.getLong("lockout_timestamp", 0);
