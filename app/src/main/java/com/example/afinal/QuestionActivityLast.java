@@ -380,6 +380,7 @@ public class QuestionActivityLast extends AppCompatActivity {
         });
     }
 
+
     private void backSetup() {
         back=findViewById(R.id.btnBackQAL);
         back.setOnClickListener(new View.OnClickListener() {
