@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import com.example.afinal.analytics.AuthInitializer;
+
 public class MainActivity extends AppCompatActivity {
     private TabHost tabmain;
     private ListView lvTopic,lvLevel;
@@ -46,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Ensure we have an authenticated user (anonymous if not logged in)
+        AuthInitializer.ensureAnonymousSignIn();
 
         processCopy();
         database = openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);

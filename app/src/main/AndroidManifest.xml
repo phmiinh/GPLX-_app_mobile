@@ -34,10 +34,10 @@
             android:name=".QuestionActivityLobby"
             android:exported="false" />
         <activity
-            android:name=".QuestionActivityLast"
+            android:name=".MockExamActivity"
             android:exported="false" />
         <activity
-            android:name=".QuestionActivityNow"
+            android:name=".PracticeActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"

@@ -68,7 +68,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
                     }
                     if(s.equals("Xem đáp án sau khi hoàn thành bài thi")){
 
-                        Intent nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityLast.class);
+                        Intent nextIntent = new Intent(QuestionActivityLobby.this,MockExamActivity.class);
                         String name=intent.getStringExtra("name");
                         nextIntent.putExtra("name",name);
                         nextIntent.putExtra("id",id);
@@ -90,7 +90,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
 
                     }
                     else {
-                        Intent nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityNow.class);
+                        Intent nextIntent = new Intent(QuestionActivityLobby.this,PracticeActivity.class);
                         String name=intent.getStringExtra("name");
                         nextIntent.putExtra("name",name);
                         nextIntent.putExtra("id",id);
