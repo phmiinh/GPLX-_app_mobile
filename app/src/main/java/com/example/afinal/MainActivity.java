@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     private void findView() {
         lvLevel=findViewById(R.id.lvLevel);
         lvTopic = findViewById(R.id.lv_topic);
