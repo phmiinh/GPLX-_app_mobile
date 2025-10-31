@@ -57,14 +57,27 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        findView();
-        processCopy();
-        database = openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
+        init();
+
         setMenu();
         tabmainsetup();
         tab_topic_setup();
         tab_level_setup();
 
+    }
+    private  void  init(){
+        processCopy();
+        database = openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
+        find_view();
+        arrayList=new ArrayList<>();
+        list=new ArrayList<>();
+    }
+    private void find_view() {
+        lvLevel=findViewById(R.id.lvLevel);
+        lvTopic = findViewById(R.id.lv_topic);
+        btnMenu=findViewById(R.id.btnMenuMain);
+        btnBackLevel=findViewById(R.id.btnBackLevel);
+        btnBackTopic=findViewById(R.id.btnBackTopic);
     }
 
     private void setMenu() {
@@ -72,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showpopup();
-
             }
         });
     }
@@ -104,18 +116,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void findView() {
-        lvLevel=findViewById(R.id.lvLevel);
-        lvTopic = findViewById(R.id.lv_topic);
-        btnMenu=findViewById(R.id.btnMenuMain);
-        btnBackLevel=findViewById(R.id.btnBackLevel);
-        btnBackTopic=findViewById(R.id.btnBackTopic);
-    }
+
 
 
     private void tab_level_setup() {
         btnBackLevel.setVisibility(View.GONE);
-        arrayList=new ArrayList<>();
         Cursor cursor = database.query("level",null,null,null,null,null,null);
         if(cursor.moveToFirst()){
             while (!cursor.isAfterLast()){
@@ -146,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void tab_topic_setup() {
         btnBackTopic.setVisibility(View.GONE);
-        list=new ArrayList<>();
+
         Cursor cursor = database.query("categories",null,null,null,null,null,null);
         if(cursor.moveToFirst()) {
             while (!cursor.isAfterLast()){

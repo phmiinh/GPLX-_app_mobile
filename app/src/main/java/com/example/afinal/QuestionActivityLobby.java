@@ -42,8 +42,55 @@ public class QuestionActivityLobby extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        init();
         setDisplay();
+        choose_all_setting();
+        run_setting();
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+    }
+
+    private void init() {
+        find_view();
+        intent=getIntent();
+        get_from_intent();
+    }
+
+    private void get_from_intent() {
+        id=intent.getStringExtra("id");
+        topicid=intent.getIntExtra("categories_id",0);
+        Log.d("con cac", "topicidlobby: "+topicid);
+        if(id.equals("topic")){
+            min=intent.getIntExtra("start",1);
+            max=intent.getIntExtra("end",1);
+        }
+        else{
+            min=intent.getIntExtra("min",1);
+            time=intent.getIntExtra("time",1);
+            total=intent.getIntExtra("total",1);
+            level_id=intent.getIntExtra("level_id",1);
+        }
+    }
+
+    private void find_view() {
         all=findViewById(R.id.btnLobbyChoseAll);
+        run=findViewById(R.id.btnLobbyStart);
+        back=findViewById(R.id.btnLobbyBack);
+        radioGroup=findViewById(R.id.rgLobby);
+        num=findViewById(R.id.txtLobbyNumofQues);
+        name=findViewById(R.id.txtLobbyCategoriesName);
+        choice=findViewById(R.id.LayoutLobbyChoice);
+        info=findViewById(R.id.txtLobbyinfo);
+        start=findViewById(R.id.txtLobbyStart);
+        end=findViewById(R.id.txtLobbyEnd);
+    }
+
+    private void choose_all_setting() {
         all.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,8 +98,9 @@ public class QuestionActivityLobby extends AppCompatActivity {
                 end.setText(String.valueOf(max));
             }
         });
+    }
 
-        run=findViewById(R.id.btnLobbyStart);
+    private void run_setting() {
         run.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +115,6 @@ public class QuestionActivityLobby extends AppCompatActivity {
                         return;
                     }
                     if(s.equals("Xem đáp án sau khi hoàn thành bài thi")){
-
                         Intent nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityLast.class);
                         String name=intent.getStringExtra("name");
                         nextIntent.putExtra("name",name);
@@ -112,18 +159,9 @@ public class QuestionActivityLobby extends AppCompatActivity {
                 }
             }
         });
-        back=findViewById(R.id.btnLobbyBack);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
     }
 
     private String getChoice() {
-        radioGroup=findViewById(R.id.rgLobby);
         int id=radioGroup.getCheckedRadioButtonId();
         if(id==-1) return "";
         RadioButton radioButton=findViewById(id);
@@ -139,21 +177,9 @@ public class QuestionActivityLobby extends AppCompatActivity {
     }
 
     private void setDisplay() {
-        num=findViewById(R.id.txtLobbyNumofQues);
-        name=findViewById(R.id.txtLobbyCategoriesName);
-        choice=findViewById(R.id.LayoutLobbyChoice);
-        info=findViewById(R.id.txtLobbyinfo);
-        intent=getIntent();
-        id=intent.getStringExtra("id");
-        topicid=intent.getIntExtra("categories_id",0);
-        Log.d("con cac", "topicidlobby: "+topicid);
         if(id.equals("topic")){
             name.setText(intent.getStringExtra("name"));
             num.setText(String.valueOf(intent.getIntExtra("num",1))+" câu");
-            start=findViewById(R.id.txtLobbyStart);
-            end=findViewById(R.id.txtLobbyEnd);
-            min=intent.getIntExtra("start",1);
-            max=intent.getIntExtra("end",1);
             start.setHint("Tối thiểu: "+String.valueOf(min));
             end.setHint("Tối đa: "+String.valueOf(max));
             choice.setVisibility(View.VISIBLE);
@@ -161,14 +187,9 @@ public class QuestionActivityLobby extends AppCompatActivity {
         }
         else{
             name.setText("Hạng "+intent.getStringExtra("name"));
-            min=intent.getIntExtra("min",1);
-            time=intent.getIntExtra("time",1);
-            total=intent.getIntExtra("total",1);
-            level_id=intent.getIntExtra("level_id",1);
             choice.setVisibility(View.GONE);
             num.setText(String.valueOf(total)+" câu");
             info.setText("Cần đúng ít nhất: "+min+"\n"+"Thời gian: "+time+" phút.");
-
         }
 
     }

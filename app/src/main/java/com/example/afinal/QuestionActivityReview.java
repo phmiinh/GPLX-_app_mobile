@@ -26,6 +26,7 @@ public class QuestionActivityReview extends AppCompatActivity {
     private ArrayList<Integer> list_question;
     private HashMap<Integer,String> choice;
     private SQLiteDatabase database=null;
+    private  Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,23 +37,32 @@ public class QuestionActivityReview extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
-        Intent intent=getIntent();
-        list_question=intent.getIntegerArrayListExtra("list");
-        choice=(HashMap<Integer,String>) intent.getSerializableExtra("choice");
+        init();
         lvsetting();
         backsetup();
 
     }
+    private  void init(){
+        database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
+        intent=getIntent();
+        find_view();
+        get_from_intent();
+    }
+
+    private void get_from_intent() {
+        list_question=intent.getIntegerArrayListExtra("list");
+        choice=(HashMap<Integer,String>) intent.getSerializableExtra("choice");
+    }
+
+    private void find_view() {
+        lv=findViewById(R.id.lvQAR);
+    }
 
     private void lvsetting() {
-        lv=findViewById(R.id.lvQAR);
-
         ArrayList<Question>list=new ArrayList<>();
         getList(list);
         QuestionAdapter adapter=new QuestionAdapter(QuestionActivityReview.this,R.layout.layout_listview_review,list);
         lv.setAdapter(adapter);
-
     }
 
     private void getList(ArrayList<Question> list) {
