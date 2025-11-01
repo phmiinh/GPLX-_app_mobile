@@ -4,11 +4,19 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,8 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-
-import com.example.afinal.analytics.AuthInitializer;
+import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
     private TabHost tabmain;
@@ -38,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Categories> list;
     private ArrayList<Level> arrayList;
     private SQLiteDatabase database=null;
+    private ImageButton btnMenu;
+    private  Button btnBackLevel,btnBackTopic;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,21 +57,70 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        init();
 
-        // Ensure we have an authenticated user (anonymous if not logged in)
-        AuthInitializer.ensureAnonymousSignIn();
-
-        processCopy();
-        database = openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
-
+        setMenu();
         tabmainsetup();
         tab_topic_setup();
         tab_level_setup();
 
     }
+    private  void  init(){
+        processCopy();
+        database = openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
+        find_view();
+        arrayList=new ArrayList<>();
+        list=new ArrayList<>();
+    }
+    private void find_view() {
+        lvLevel=findViewById(R.id.lvLevel);
+        lvTopic = findViewById(R.id.lv_topic);
+        btnMenu=findViewById(R.id.btnMenuMain);
+        btnBackLevel=findViewById(R.id.btnBackLevel);
+        btnBackTopic=findViewById(R.id.btnBackTopic);
+    }
+
+    private void setMenu() {
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showpopup();
+            }
+        });
+    }
+
+    private void showpopup() {
+        LayoutInflater myflat= MainActivity.this.getLayoutInflater();
+        View popup=myflat.inflate(R.layout.menu_main,null);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int screenWidth = metrics.widthPixels;
+        PopupWindow popupWindow=new PopupWindow(popup, (int) (screenWidth*0.7),ViewGroup.LayoutParams.MATCH_PARENT,true);
+        popupWindow.setElevation(10f);
+        popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.TOP|Gravity.START,0,0);
+        TextView lv=popup.findViewById(R.id.txtMenuLevel);
+
+        lv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,LevelActivity.class);
+                startActivity(intent);
+            }
+        });
+        TextView topic=popup.findViewById(R.id.txtMenuTopic);
+        topic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,TopicActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+
 
     private void tab_level_setup() {
-        arrayList=new ArrayList<>();
+        btnBackLevel.setVisibility(View.GONE);
         Cursor cursor = database.query("level",null,null,null,null,null,null);
         if(cursor.moveToFirst()){
             while (!cursor.isAfterLast()){
@@ -71,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 cursor.moveToNext();
             }
         }
-        lvLevel=findViewById(R.id.lvLevel);
+
         LevelAdapter adapter=new LevelAdapter(MainActivity.this,R.layout.layout_listview_level,arrayList);
         lvLevel.setAdapter(adapter);
         lvLevel.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -92,7 +150,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void tab_topic_setup() {
-        list=new ArrayList<>();
+        btnBackTopic.setVisibility(View.GONE);
+
         Cursor cursor = database.query("categories",null,null,null,null,null,null);
         if(cursor.moveToFirst()) {
             while (!cursor.isAfterLast()){
@@ -104,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         }
         list.add(new Categories(7,"Câu hỏi điểm liệt",60,1,60));
         //View tabView = findViewById(R.id.tab_topic_main);
-        lvTopic = findViewById(R.id.lv_topic);
+
         CategoriesAdapter adapter=new CategoriesAdapter(MainActivity.this,R.layout.layout_listview_topic,list);
         lvTopic.setAdapter(adapter);
         lvTopic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -143,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
         File dbFile = getDatabasePath(DATABASE_NAME);
         if (!dbFile.exists())
         {
-
             try{CopyDataBaseFromAsset();
                 Log.d( "copydata:", "processCopy: Copying sucess from Assets folder");
             }
