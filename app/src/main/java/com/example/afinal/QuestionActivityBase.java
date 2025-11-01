@@ -25,10 +25,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.afinal.analytics.AnalyticsRepository;
+import com.example.afinal.analytics.FirestoreService;
+import com.example.afinal.analytics.UserIdentity;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 public class QuestionActivityBase extends AppCompatActivity {
     protected  TextView topicname;
@@ -50,6 +57,13 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected  Cursor cursor=null;
 
     protected  HashMap<Integer,Integer>rule;
+    
+    // Firebase Analytics
+    protected AnalyticsRepository analyticsRepository;
+    protected FirestoreService firestoreService;
+    protected String sessionId;
+    protected long sessionStartAt;
+    protected long questionStartAt;
 
 
     protected void init(){
@@ -58,6 +72,14 @@ public class QuestionActivityBase extends AppCompatActivity {
         get_from_intent();
         hashMap=new HashMap<>();
         answer=new HashMap<>();
+        
+        // Initialize Firebase Analytics
+        analyticsRepository = new AnalyticsRepository(this);
+        analyticsRepository.ensureSchema();
+        firestoreService = new FirestoreService();
+        sessionId = UUID.randomUUID().toString();
+        sessionStartAt = System.currentTimeMillis();
+        questionStartAt = 0;
     }
     protected void get_from_intent() {
         id=intent.getStringExtra("id");
@@ -109,6 +131,11 @@ public class QuestionActivityBase extends AppCompatActivity {
 
     }
     protected void set_content(Cursor cursor,Context context) {
+        // Log attempt for previous question if there was one
+        if (questionStartAt > 0) {
+            logAttemptForCurrent();
+        }
+        
         ques_id=cursor.getInt(0);
         content.setText("Câu "+ques_id+": "+cursor.getString(2));
         a.setText(cursor.getString(6));
@@ -146,8 +173,49 @@ public class QuestionActivityBase extends AppCompatActivity {
                 Toast.makeText(context, "Không thể tải ảnh", Toast.LENGTH_SHORT).show();
             }
         }
+        
+        // Start timing for new question
+        questionStartAt = System.currentTimeMillis();
+    }
+    
+    protected void logAttemptForCurrent() {
+        int selectedId = radioGroup.getCheckedRadioButtonId();
+        if (selectedId == -1) return;
+        RadioButton selected = findViewById(selectedId);
+        if (selected == null) return;
+        String chosen = selected.getText().toString();
+        boolean correct = chosen.equals(ans);
+        long now = System.currentTimeMillis();
+        long spent = questionStartAt > 0 ? (now - questionStartAt) : 0L;
+        boolean hasImg = img_url != null && !img_url.isEmpty();
+        int topicId = 0;
+        try {
+            topicId = cursor.getInt(1);
+        } catch (Exception ignored) {}
 
+        Map<String, Object> record = new HashMap<>();
+        record.put("user_id", UserIdentity.getUserId(this));
+        record.put("question_id", ques_id);
+        record.put("topic_id", topicId);
+        record.put("is_correct", correct);
+        record.put("time_spent_ms", spent);
+        record.put("timestamp", now);
+        record.put("session_id", sessionId);
+        record.put("mode", id.equals("topic") ? "practice_topic" : "mock_exam");
+        record.put("has_image", hasImg);
+        
+        // Save to local database
+        analyticsRepository.insertAttempt(record);
+        // Save to Firestore
+        firestoreService.saveAttempt(record);
 
+        // Save question meta
+        Map<String, Object> qm = new HashMap<>();
+        qm.put("topic_id", topicId);
+        qm.put("is_critical", cursor.getInt(4) == 1);
+        qm.put("has_image", hasImg);
+        analyticsRepository.upsertQuestionMeta(ques_id, topicId, cursor.getInt(4) == 1, hasImg);
+        firestoreService.upsertQuestionMeta(String.format(Locale.US, "%d", ques_id), qm);
     }
     protected void setCursor() {
         if(id.equals("topic")){
@@ -262,11 +330,16 @@ public class QuestionActivityBase extends AppCompatActivity {
         builder1.setTitle("Kết quả");
         String msg="/"+count;
         int truecnt=0;
+        int numCriticalWrong = 0;
         for(Integer q:hashMap.keySet()){
             if(hashMap.get(q).equals(answer.get(q))) {
                 truecnt++;
                 if(q==critical){
                     state="Đỗ";
+                }
+            } else {
+                if(q==critical){
+                    numCriticalWrong++;
                 }
             }
         }
@@ -277,6 +350,25 @@ public class QuestionActivityBase extends AppCompatActivity {
             if(truecnt<min) state="Trượt";
             msg+=state;
         }
+        
+        // Save exam session to Firebase
+        Map<String, Object> session = new HashMap<>();
+        String userId = UserIdentity.getUserId(this);
+        long now = System.currentTimeMillis();
+        session.put("session_id", sessionId);
+        session.put("user_id", userId);
+        session.put("started_at", sessionStartAt);
+        session.put("submitted_at", now);
+        session.put("duration_ms", now - sessionStartAt);
+        session.put("blueprint_used", buildBlueprintUsed());
+        session.put("score_raw", truecnt);
+        session.put("score_pct", count == 0 ? 0.0 : (truecnt * 100.0) / count);
+        session.put("num_correct", truecnt);
+        session.put("num_incorrect", Math.max(0, count - truecnt));
+        session.put("num_liet_wrong", numCriticalWrong);
+        analyticsRepository.upsertExamSession(session);
+        firestoreService.saveExamSession(session);
+        
         builder1.setMessage(msg);
         builder1.setNegativeButton("Thoát", new DialogInterface.OnClickListener() {
             @Override
@@ -313,7 +405,18 @@ public class QuestionActivityBase extends AppCompatActivity {
             cursor.moveToNext();
         }
     }
-
+    
+    protected String buildBlueprintUsed() {
+        if (rule == null || rule.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (Integer k : rule.keySet()) {
+            if (!first) sb.append(",");
+            sb.append(k).append(":").append(rule.get(k));
+            first = false;
+        }
+        return sb.toString();
+    }
 
     protected void backSetup(Context context) {
         back.setOnClickListener(new View.OnClickListener() {

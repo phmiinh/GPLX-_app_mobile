@@ -25,6 +25,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.afinal.adapter.LevelAdapter;
+import com.example.afinal.analytics.AuthInitializer;
 import com.example.afinal.dbclass.Categories;
 import com.example.afinal.adapter.CategoriesAdapter;
 import com.example.afinal.dbclass.Level;
@@ -58,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         init();
+
+        // Initialize Firebase Anonymous Auth for analytics
+        AuthInitializer.ensureAnonymousSignIn();
 
         setMenu();
         tabmainsetup();

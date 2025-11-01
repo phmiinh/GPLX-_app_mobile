@@ -88,6 +88,8 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     return;
                 }
                 if(next.getText().toString().equals("Kiểm tra")){
+                    // Log attempt before showing answer
+                    logAttemptForCurrent();
                     // Highlight correct (green) and incorrect (red) answers
                     AnswerColorHelper.showAnswerWithColors(a,b,c,d, radioGroup, ans);
                     explain.setText("Giải thích: "+explaination);
