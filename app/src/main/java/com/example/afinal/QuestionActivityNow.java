@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,14 +26,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.afinal.dbclass.Question;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 public class QuestionActivityNow extends QuestionActivityBase {
-
     private Button next;
-
     private TextView explain;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +47,11 @@ public class QuestionActivityNow extends QuestionActivityBase {
         });
         init();
         String topic=intent.getStringExtra("name");
-        if(id.equals("level")) topicname.setText("Hạng "+topic);
-        else topicname.setText(topic);
+        if(id.equals("topic")) topicname.setText(topic);
+        else topicname.setText("Hạng "+topic);
         backSetup(QuestionActivityNow.this);
-        setCursor();
-        setting(cursor,QuestionActivityNow.this);
+        setting(QuestionActivityNow.this);
         submitSetup(QuestionActivityNow.this);
-
     }
     @Override
     protected void init(){
@@ -73,12 +72,10 @@ public class QuestionActivityNow extends QuestionActivityBase {
         submit=findViewById(R.id.btnQAN_submit);
         back=findViewById(R.id.btnBackQAN);
     }
-
     @Override
-    protected void setting(Cursor cursor, Context context) {
-        super.setting(cursor,context);
-        set_content(cursor,context);
-        answer.put(ques_id,ans);
+    protected void setting(Context context) {
+        super.setting(context);
+        set_content(listQuestion.get(0), context);
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,32 +85,31 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     return;
                 }
                 if(next.getText().toString().equals("Kiểm tra")){
-                    // Highlight correct (green) and incorrect (red) answers
-                    AnswerColorHelper.showAnswerWithColors(a,b,c,d, radioGroup, ans);
-                    explain.setText("Giải thích: "+explaination);
+                    explain.setText("Giải thích: "+listQuestion.get(anInt).getExplain());
                     next.setText("Câu tiếp theo");
+                    // Highlight correct (green) and incorrect (red) answers
+                    AnswerColorHelper.showAnswerWithColors(a,b,c,d, radioGroup, listQuestion.get(anInt).getAnswer());
                     return;
                 }
-                if(cursor.isLast()) return;
+                anInt++;
+                if(anInt>=listQuestion.size()) {
+                    return;
+                }
                 else{
                     explain.setText("");
                     next.setText("Kiểm tra");
-                    cursor.moveToNext();
-                    set_content(cursor,context);
-                    answer.put(ques_id,ans);
-
+                    set_content(listQuestion.get(anInt),context);
                 }
             }
         });
 
     }
-
     @Override
-    protected void set_content(Cursor cursor, Context context) {
-        super.set_content(cursor,context);
+    protected void set_content(Question question, Context context) {
+        super.set_content(question,context);
         radioGroup.clearCheck();
-        hashMap.remove(ques_id);
-        // Reset answer visuals to default for new question
+        question.setUserChoice(null);
+        listQuestion.get(anInt).setUserChoice(null);
         AnswerColorHelper.resetAnswerColors(a,b,c,d);
     }
 

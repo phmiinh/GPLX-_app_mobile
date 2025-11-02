@@ -24,6 +24,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.afinal.DAO.CategoriesDAO;
 import com.example.afinal.adapter.LevelAdapter;
 import com.example.afinal.dbclass.Categories;
 import com.example.afinal.adapter.CategoriesAdapter;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase database=null;
     private ImageButton btnMenu;
     private  Button btnBackLevel,btnBackTopic;
+    private CategoriesDAO categoriesDAO;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,8 +71,9 @@ public class MainActivity extends AppCompatActivity {
         processCopy();
         database = openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         find_view();
-        arrayList=new ArrayList<>();
-        list=new ArrayList<>();
+        categoriesDAO=new CategoriesDAO(database);
+        arrayList=categoriesDAO.getAllLevel();;
+        list=categoriesDAO.getAllCategories();
     }
     private void find_view() {
         lvLevel=findViewById(R.id.lvLevel);
@@ -121,15 +124,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void tab_level_setup() {
         btnBackLevel.setVisibility(View.GONE);
-        Cursor cursor = database.query("level",null,null,null,null,null,null);
-        if(cursor.moveToFirst()){
-            while (!cursor.isAfterLast()){
-                arrayList.add(new Level(cursor.getInt(0),cursor.getString(1),
-                        cursor.getInt(2),cursor.getInt(3),cursor.getInt(4)));
-                cursor.moveToNext();
-            }
-        }
-
         LevelAdapter adapter=new LevelAdapter(MainActivity.this,R.layout.layout_listview_level,arrayList);
         lvLevel.setAdapter(adapter);
         lvLevel.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -151,19 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void tab_topic_setup() {
         btnBackTopic.setVisibility(View.GONE);
-
-        Cursor cursor = database.query("categories",null,null,null,null,null,null);
-        if(cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()){
-                list.add(new Categories(cursor.getInt(0),
-                        cursor.getString(1),cursor.getInt(2),cursor.getInt(3),cursor.getInt(4)));
-                cursor.moveToNext();
-            }
-
-        }
         list.add(new Categories(7,"Câu hỏi điểm liệt",60,1,60));
-        //View tabView = findViewById(R.id.tab_topic_main);
-
         CategoriesAdapter adapter=new CategoriesAdapter(MainActivity.this,R.layout.layout_listview_topic,list);
         lvTopic.setAdapter(adapter);
         lvTopic.setOnItemClickListener(new AdapterView.OnItemClickListener() {

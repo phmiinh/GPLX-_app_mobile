@@ -114,48 +114,30 @@ public class QuestionActivityLobby extends AppCompatActivity {
                         Toast.makeText(QuestionActivityLobby.this, "Vui lòng chọn hình thức!", Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    Intent nextIntent;
                     if(s.equals("Xem đáp án sau khi hoàn thành bài thi")){
-                        Intent nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityLast.class);
-                        String name=intent.getStringExtra("name");
-                        nextIntent.putExtra("name",name);
-                        nextIntent.putExtra("id",id);
-                        nextIntent.putExtra("categories_id",topicid);
-                        if(id.equals("topic")){
-                            nextIntent.putExtra("start",l);
-                            nextIntent.putExtra("end",r);
-                        }
-                        else{
-                            nextIntent.putExtra("level_id",level_id);
-                            nextIntent.putExtra("min",min);
-
-                            Log.d("TAG", "onClick: "+total);
-                            nextIntent.putExtra("total",total);
-                            nextIntent.putExtra("time",time);
-                        }
-                        startActivity(nextIntent);
-
-
+                        nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityLast.class);
                     }
                     else {
-                        Intent nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityNow.class);
-                        String name=intent.getStringExtra("name");
-                        nextIntent.putExtra("name",name);
-                        nextIntent.putExtra("id",id);
-                        nextIntent.putExtra("categories_id",topicid);
-                        if(id.equals("topic")){
-                            nextIntent.putExtra("start",l);
-                            nextIntent.putExtra("end",r);
-                        }
-                        else{
-                            nextIntent.putExtra("level_id",level_id);
-                            nextIntent.putExtra("min",min);
-
-                            Log.d("TAG", "onClick: "+total);
-                            nextIntent.putExtra("total",total);
-                            nextIntent.putExtra("time",time);
-                        }
-                        startActivity(nextIntent);
+                        nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityNow.class);
                     }
+                    String name=intent.getStringExtra("name");
+                    nextIntent.putExtra("name",name);
+                    nextIntent.putExtra("id",id);
+                    nextIntent.putExtra("categories_id",topicid);
+                    if(id.equals("topic")){
+                        nextIntent.putExtra("start",l);
+                        nextIntent.putExtra("end",r);
+                    }
+                    else{
+                        nextIntent.putExtra("level_id",level_id);
+                        nextIntent.putExtra("min",min);
+
+                        Log.d("TAG", "onClick: "+total);
+                        nextIntent.putExtra("total",total);
+                        nextIntent.putExtra("time",time);
+                    }
+                    startActivity(nextIntent);
                 }
             }
         });
@@ -191,6 +173,5 @@ public class QuestionActivityLobby extends AppCompatActivity {
             num.setText(String.valueOf(total)+" câu");
             info.setText("Cần đúng ít nhất: "+min+"\n"+"Thời gian: "+time+" phút.");
         }
-
     }
 }

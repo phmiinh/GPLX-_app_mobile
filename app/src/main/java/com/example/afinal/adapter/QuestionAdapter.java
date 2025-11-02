@@ -2,6 +2,7 @@ package com.example.afinal.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -99,20 +100,29 @@ public class QuestionAdapter extends ArrayAdapter<Question> {
         if(ans.equals(question.getD())){
             d.setBackgroundResource(R.drawable.answer_correct);
         }
-        if(!ans.equals(question.getUserChoice())){
-            if(question.getUserChoice().equals(question.getA())){
-                a.setBackgroundResource(R.drawable.answer_incorrect);
-            }
-            else if(question.getUserChoice().equals(question.getB())){
-                b.setBackgroundResource(R.drawable.answer_incorrect);
-            }
-            if(question.getUserChoice().equals(question.getC())){
-                c.setBackgroundResource(R.drawable.answer_incorrect);
-            }
-            if(question.getUserChoice().equals(question.getD())){
-                d.setBackgroundResource(R.drawable.answer_incorrect);
+        content.setBackgroundColor(Color.parseColor("#B5F09D"));
+        if(question.getUserChoice()!=null){
+            if(!ans.equals(question.getUserChoice())){
+                content.setBackgroundColor(Color.parseColor("#E9B6B6"));
+                if(question.getUserChoice().equals(question.getA())){
+                    a.setBackgroundResource(R.drawable.answer_incorrect);
+                }
+                else if(question.getUserChoice().equals(question.getB())){
+                    b.setBackgroundResource(R.drawable.answer_incorrect);
+                }
+                if(question.getUserChoice().equals(question.getC())){
+                    c.setBackgroundResource(R.drawable.answer_incorrect);
+                }
+                if(question.getUserChoice().equals(question.getD())){
+                    d.setBackgroundResource(R.drawable.answer_incorrect);
+                }
             }
         }
+        else{
+            content.setText("Câu "+question.getId()+"(Chưa chọn đáp án): "+question.getContent());
+            content.setBackgroundColor(Color.parseColor("#FFF8B2"));
+        }
+
         return convertView;
     }
 }

@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-public class Question {
+public class Question implements Parcelable {
     private int id,topic_id,is_critical;
     private String content,img_url,explain,A,B,C,D,Answer,UserChoice;
 
@@ -27,6 +27,33 @@ public class Question {
         Answer = answer;
         UserChoice = userChoice;
     }
+
+    protected Question(Parcel in) {
+        id = in.readInt();
+        topic_id = in.readInt();
+        is_critical = in.readInt();
+        content = in.readString();
+        img_url = in.readString();
+        explain = in.readString();
+        A = in.readString();
+        B = in.readString();
+        C = in.readString();
+        D = in.readString();
+        Answer = in.readString();
+        UserChoice = in.readString();
+    }
+
+    public static final Creator<Question> CREATOR = new Creator<Question>() {
+        @Override
+        public Question createFromParcel(Parcel in) {
+            return new Question(in);
+        }
+
+        @Override
+        public Question[] newArray(int size) {
+            return new Question[size];
+        }
+    };
 
     public String getExplain() {
         return explain;
@@ -122,5 +149,26 @@ public class Question {
 
     public void setUserChoice(String userChoice) {
         UserChoice = userChoice;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeInt(topic_id);
+        dest.writeInt(is_critical);
+        dest.writeString(content);
+        dest.writeString(img_url);
+        dest.writeString(explain);
+        dest.writeString(A);
+        dest.writeString(B);
+        dest.writeString(C);
+        dest.writeString(D);
+        dest.writeString(Answer);
+        dest.writeString(UserChoice);
     }
 }

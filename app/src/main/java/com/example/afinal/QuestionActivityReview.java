@@ -23,9 +23,8 @@ import java.util.HashMap;
 public class QuestionActivityReview extends AppCompatActivity {
     private Button back;
     private ListView lv;
-    private ArrayList<Integer> list_question;
+    private  ArrayList<Question> listQuestion;
     private HashMap<Integer,String> choice;
-    private SQLiteDatabase database=null;
     private  Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +42,13 @@ public class QuestionActivityReview extends AppCompatActivity {
 
     }
     private  void init(){
-        database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         intent=getIntent();
         find_view();
         get_from_intent();
     }
 
     private void get_from_intent() {
-        list_question=intent.getIntegerArrayListExtra("list");
-        choice=(HashMap<Integer,String>) intent.getSerializableExtra("choice");
+        listQuestion=intent.getParcelableArrayListExtra("listQuestion");
     }
 
     private void find_view() {
@@ -59,32 +56,9 @@ public class QuestionActivityReview extends AppCompatActivity {
     }
 
     private void lvsetting() {
-        ArrayList<Question>list=new ArrayList<>();
-        getList(list);
-        QuestionAdapter adapter=new QuestionAdapter(QuestionActivityReview.this,R.layout.layout_listview_review,list);
+        QuestionAdapter adapter=new QuestionAdapter(QuestionActivityReview.this,R.layout.layout_listview_review,listQuestion);
         lv.setAdapter(adapter);
     }
-
-    private void getList(ArrayList<Question> list) {
-        for(Integer i:list_question){
-            Cursor cursor=database.query("questions",null,"question_id=?",new String[]{String.valueOf(i)},null,null,null);
-            cursor.moveToFirst();
-            Question x=new Question();
-            x.setId(cursor.getInt(0));
-            x.setContent(cursor.getString(2));
-            x.setImg_url(cursor.getString(3));
-            x.setExplain(cursor.getString(5));
-            x.setA(cursor.getString(6));
-            x.setB(cursor.getString(7));
-            x.setC(cursor.getString(8));
-            x.setD(cursor.getString(9));
-            x.setAnswer(cursor.getString(10));
-            x.setIs_critical(cursor.getInt(4));
-            x.setUserChoice(choice.getOrDefault(i,"0"));
-            list.add(x);
-        }
-    }
-
     private void backsetup() {
         back=findViewById(R.id.btnQARback);
         back.setOnClickListener(new View.OnClickListener() {
