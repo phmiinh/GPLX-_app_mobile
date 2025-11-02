@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,9 +24,11 @@ import java.util.HashMap;
 public class QuestionActivityReview extends AppCompatActivity {
     private Button back;
     private ListView lv;
+    private TextView info;
     private  ArrayList<Question> listQuestion;
     private HashMap<Integer,String> choice;
     private  Intent intent;
+    private String result,startTime,endTime,time;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +42,12 @@ public class QuestionActivityReview extends AppCompatActivity {
         init();
         lvsetting();
         backsetup();
+        setInfo();
 
+    }
+    private void setInfo() {
+        String s = "Kết quả: "+result+"\n"+"Từ: "+startTime+" đến "+endTime;
+        info.setText(s);
     }
     private  void init(){
         intent=getIntent();
@@ -49,10 +57,15 @@ public class QuestionActivityReview extends AppCompatActivity {
 
     private void get_from_intent() {
         listQuestion=intent.getParcelableArrayListExtra("listQuestion");
+        result=intent.getStringExtra("result");
+        startTime=intent.getStringExtra("startTime");
+        endTime=intent.getStringExtra("endTime");
+        time=intent.getStringExtra("time");
     }
 
     private void find_view() {
         lv=findViewById(R.id.lvQAR);
+        info=findViewById(R.id.txtQARinfo);
     }
 
     private void lvsetting() {

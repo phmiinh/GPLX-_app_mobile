@@ -30,7 +30,11 @@ import com.example.afinal.dbclass.Question;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class QuestionActivityBase extends AppCompatActivity {
@@ -40,21 +44,29 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected SQLiteDatabase database= null;
     protected  RadioButton a,b,c,d;
     protected ImageView imgQuestion;
-    protected  String  img_url="",id,state="Trượt";
+    protected  String  img_url="",id,state="Trượt",msg, startTime,endTime;;
     protected  RadioGroup radioGroup;
-    protected  int start,end,level,min,time,topicid,count;
+    protected  int start,end,level,min,time,topicid,count,anInt = 0;
     protected  Intent intent;
     protected  HashMap<Integer,Integer>rule;
     protected ArrayList<Question> listQuestion;
     protected QuestionDAO questionDAO;
-    protected int anInt = 0;
+    protected SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 
     protected void init(){
         intent=getIntent();
+        startTime=getTime();
         database=openOrCreateDatabase("ATGT.db",MODE_PRIVATE,null);
         get_from_intent();
         questionDAO=new QuestionDAO(database);
         get_list_question();
+    }
+    public String getTime() {
+        LocalDateTime now = LocalDateTime.now();
+        String formattedDate = now.format(formatter);
+        return formattedDate;
     }
     private void get_list_question() {
         if(id.equals("topic")){
@@ -154,6 +166,7 @@ public class QuestionActivityBase extends AppCompatActivity {
                 builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        endTime=getTime();
                         showpoint(context);
                     }
                 });
@@ -172,7 +185,7 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected void showpoint(Context context) {
         AlertDialog.Builder builder1=new AlertDialog.Builder(context);
         builder1.setTitle("Kết quả");
-        String msg="/"+count;
+        msg="/"+count;
         int truecnt=0;
         for(Question question:listQuestion){
             if(question.getUserChoice()==null) continue;
@@ -183,6 +196,8 @@ public class QuestionActivityBase extends AppCompatActivity {
         }
         msg=String.valueOf(truecnt)+msg;
         if(id.equals("level")){
+            msg+="\n";
+            msg+="Thời gian: "+getTimeTest();
             msg+="\n";
             msg+="Trạng thái: ";
             if(truecnt<min) state="Trượt";
@@ -200,6 +215,10 @@ public class QuestionActivityBase extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 Intent nextIntent=new Intent(context,QuestionActivityReview.class);
                 nextIntent.putParcelableArrayListExtra("listQuestion",listQuestion);
+                nextIntent.putExtra("result",msg);
+                nextIntent.putExtra("startTime",startTime);
+                nextIntent.putExtra("endTime",endTime);
+                nextIntent.putExtra("time",getTimeTest());
                 startActivity(nextIntent);
                 finish();
             }
@@ -207,7 +226,20 @@ public class QuestionActivityBase extends AppCompatActivity {
         AlertDialog alertDialog=builder1.create();
         alertDialog.show();
     }
+    private String getTimeTest() {
+        String ans="";
+        try{
+            Date d1=sdf.parse(startTime);
+            Date d2=sdf.parse(endTime);
+            long time=Math.abs(d1.getTime()-d2.getTime())/1000;
+            ans+=String.format("%02d",(time/60))+" phút "+String.format("%02d",(time%60))+" giây";
+            return  ans;
+        }
+        catch (Exception e){
+            return null;
+        }
 
+    }
     protected void backSetup(Context context) {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
