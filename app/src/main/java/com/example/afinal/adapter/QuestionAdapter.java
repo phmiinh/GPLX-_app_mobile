@@ -62,9 +62,9 @@ public class QuestionAdapter extends ArrayAdapter<Question> {
         }
         a.setText(question.getA());
         b.setText(question.getB());
-        content.setText("Câu "+question.getId()+": "+question.getContent());
+        content.setText(question.getContent());
         if(question.getIs_critical()==1){
-            content.setText("Câu "+question.getId()+"(câu điểm liệt)"+": "+question.getContent());
+            content.setText("(câu điểm liệt) "+question.getContent());
             content.setTypeface(null, Typeface.BOLD_ITALIC);
         }
         else{
@@ -119,7 +119,7 @@ public class QuestionAdapter extends ArrayAdapter<Question> {
             }
         }
         else{
-            content.setText("Câu "+question.getId()+"(Chưa chọn đáp án): "+question.getContent());
+            content.setText("(Chưa chọn đáp án) "+question.getContent());
             content.setBackgroundColor(Color.parseColor("#FFF8B2"));
         }
 

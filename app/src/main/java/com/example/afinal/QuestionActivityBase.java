@@ -80,6 +80,9 @@ public class QuestionActivityBase extends AppCompatActivity {
         else {
             listQuestion=questionDAO.getQuestionOfLevel(level);
         }
+        for(int i=0;i<listQuestion.size();i++){
+            listQuestion.get(i).setContent("Câu "+String.valueOf(i+start)+": "+listQuestion.get(i).getContent());
+        }
 
     }
     protected void get_from_intent() {
@@ -92,6 +95,7 @@ public class QuestionActivityBase extends AppCompatActivity {
             Log.d("con cac", "topicid: "+topicid);
         }
         else {
+            start=1;
             level = intent.getIntExtra("level_id", 1);
             min = intent.getIntExtra("min", 1);
             count = intent.getIntExtra("total", 1);
@@ -119,8 +123,8 @@ public class QuestionActivityBase extends AppCompatActivity {
         }
     }
     protected void set_content(Question question,Context context) {
-        if(id.equals("topic")&&topicid<7) content.setText("Câu "+question.getId()+": "+question.getContent());
-        else content.setText("Câu "+String.valueOf(anInt+1)+": "+question.getContent());
+
+        content.setText(question.getContent());
         a.setText(question.getA());
         b.setText(question.getB());
         c.setVisibility(View.VISIBLE);
