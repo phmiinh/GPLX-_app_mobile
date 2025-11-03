@@ -25,6 +25,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class QuestionActivityNow extends QuestionActivityBase {
     private Button next;
 
     private TextView explain;
+    private Button btnAIExplain;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,13 +75,24 @@ public class QuestionActivityNow extends QuestionActivityBase {
         explain=findViewById(R.id.txtQANexplain);
         submit=findViewById(R.id.btnQAN_submit);
         back=findViewById(R.id.btnBackQAN);
+        bookmarkButton=findViewById(R.id.iv_bookmark_button);
+        setupBookmarkButton();
+        btnAIExplain=findViewById(R.id.btnAIExplain);
+        if (btnAIExplain != null) {
+            btnAIExplain.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    requestAiExplanationForCurrent();
+                }
+            });
+        }
     }
 
-    @Override
+            @Override
     protected void setting(Cursor cursor, Context context) {
         super.setting(cursor,context);
         set_content(cursor,context);
-        answer.put(ques_id,ans);
+            answer.put(ques_id,ans);
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,6 +107,11 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     // Highlight correct (green) and incorrect (red) answers
                     AnswerColorHelper.showAnswerWithColors(a,b,c,d, radioGroup, ans);
                     explain.setText("Giải thích: "+explaination);
+                    if (btnAIExplain != null) {
+                        btnAIExplain.setVisibility(View.VISIBLE);
+                        btnAIExplain.setEnabled(true);
+                        btnAIExplain.setText("AI giải thích");
+                    }
                     next.setText("Câu tiếp theo");
                     return;
                 }
@@ -103,6 +122,9 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     cursor.moveToNext();
                     set_content(cursor,context);
                     answer.put(ques_id,ans);
+                    if (btnAIExplain != null) {
+                        btnAIExplain.setVisibility(View.GONE);
+                    }
 
                 }
             }
@@ -117,6 +139,77 @@ public class QuestionActivityNow extends QuestionActivityBase {
         hashMap.remove(ques_id);
         // Reset answer visuals to default for new question
         AnswerColorHelper.resetAnswerColors(a,b,c,d);
+        if (btnAIExplain != null) {
+            btnAIExplain.setVisibility(View.GONE);
+        }
     }
 
+    private void requestAiExplanationForCurrent() {
+        if (btnAIExplain == null) return;
+        btnAIExplain.setEnabled(false);
+        btnAIExplain.setText("Đang giải thích...");
+
+        final String questionText = content.getText().toString();
+        final String optionA = a.getText().toString();
+        final String optionB = b.getText().toString();
+        final String optionC = c.getVisibility() == View.VISIBLE ? c.getText().toString() : null;
+        final String optionD = d.getVisibility() == View.VISIBLE ? d.getText().toString() : null;
+        final boolean hasImg = img_url != null && !img_url.isEmpty();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    StringBuilder prompt = new StringBuilder();
+                    prompt.append("Giải thích đáp án chi tiết bằng tiếng Việt, ngắn gọn, dễ hiểu.\n");
+                    prompt.append(questionText).append("\n");
+                    prompt.append(optionA).append("\n");
+                    prompt.append(optionB).append("\n");
+                    if (optionC != null) prompt.append(optionC).append("\n");
+                    if (optionD != null) prompt.append(optionD).append("\n");
+                    prompt.append("Chỉ ra vì sao đáp án đúng là đúng, và vì sao các đáp án khác sai.");
+
+                    GeminiApiManager api = new GeminiApiManager();
+                    String aiText;
+                    if (hasImg) {
+                        // Load image bytes from assets
+                        String assetPath = img_url; // already "img/<file>.png"
+                        byte[] bytes;
+                        try (InputStream is = getAssets().open(assetPath)) {
+                            bytes = new byte[is.available()];
+                            int read = is.read(bytes);
+                        }
+                        aiText = api.generateExplanationWithImage(prompt.toString(), bytes, "image/png");
+                    } else {
+                        aiText = api.generateExplanation(prompt.toString());
+                    }
+
+                    final String result = aiText == null ? "" : aiText.trim();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!result.isEmpty()) {
+                                String prev = explain.getText() == null ? "" : explain.getText().toString();
+                                String merged = prev.isEmpty() ? ("AI: " + result) : (prev + "\n\nAI: " + result);
+                                explain.setText(merged);
+                            } else {
+                                Toast.makeText(QuestionActivityNow.this, "AI không trả về nội dung.", Toast.LENGTH_SHORT).show();
+                            }
+                            btnAIExplain.setEnabled(true);
+                            btnAIExplain.setText("AI giải thích");
+                        }
+                    });
+                } catch (IOException | JSONException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(QuestionActivityNow.this, "Lỗi gọi AI: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            btnAIExplain.setEnabled(true);
+                            btnAIExplain.setText("AI giải thích");
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
 }

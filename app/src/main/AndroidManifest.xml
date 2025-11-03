@@ -35,6 +35,9 @@
             android:name=".QuestionActivityReview"
             android:exported="false" />
         <activity
+            android:name=".BookmarksActivity"
+            android:exported="false" />
+        <activity
             android:name=".QuestionActivityLobby"
             android:exported="false" />
         <activity

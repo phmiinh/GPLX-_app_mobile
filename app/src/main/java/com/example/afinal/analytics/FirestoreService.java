@@ -73,6 +73,24 @@ public class FirestoreService {
         });
         return task;
     }
+
+    public Task<DocumentReference> saveBookmark(Map<String, Object> data) {
+        Log.d(TAG, "Saving bookmark to Firestore: " + data);
+        Task<DocumentReference> task = db.collection("bookmarks").add(new HashMap<>(data));
+        task.addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                Log.d(TAG, "Bookmark saved successfully with ID: " + documentReference.getId());
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG, "Error saving bookmark to Firestore", e);
+            }
+        });
+        return task;
+    }
 }
 
 

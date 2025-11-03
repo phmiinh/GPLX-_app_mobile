@@ -119,6 +119,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        TextView bookmarked = popup.findViewById(R.id.textView7);
+        bookmarked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, BookmarksActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 

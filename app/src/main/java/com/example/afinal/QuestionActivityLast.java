@@ -71,12 +71,14 @@ public class QuestionActivityLast extends QuestionActivityBase {
         prev=findViewById(R.id.btnprevQAL);
         radioGroup=findViewById(R.id.radioBtnQAL);
         imgQuestion=findViewById(R.id.imgQAL);
+        bookmarkButton=findViewById(R.id.iv_bookmark_button);
+        setupBookmarkButton();
     }
-    @Override
+            @Override
     protected void setting(Cursor cursor, Context context) {
         super.setting(cursor,context);
         set_content(cursor,context);
-        answer.put(ques_id,ans);
+            answer.put(ques_id,ans);
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
