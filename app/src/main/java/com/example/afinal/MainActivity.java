@@ -29,6 +29,8 @@ import com.example.afinal.analytics.AuthInitializer;
 import com.example.afinal.dbclass.Categories;
 import com.example.afinal.adapter.CategoriesAdapter;
 import com.example.afinal.dbclass.Level;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,7 +62,13 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         init();
+        FirebaseApp.initializeApp(this);
 
+        // --- Test Firestore ---
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("test").add(new HashMap<>())
+                .addOnSuccessListener(doc -> Log.d("TEST", "OK"))
+                .addOnFailureListener(e -> Log.e("TEST", "ERR", e));
         // Initialize Firebase Anonymous Auth for analytics
         AuthInitializer.ensureAnonymousSignIn();
 
@@ -118,6 +127,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent=new Intent(MainActivity.this,TopicActivity.class);
                 startActivity(intent);
             }
+        });
+        TextView bookmark = popup.findViewById(R.id.txtMenuBookmark);
+        bookmark.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
+            startActivity(intent);
         });
     }
 

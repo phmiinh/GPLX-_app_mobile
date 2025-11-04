@@ -34,6 +34,8 @@ import java.util.HashMap;
 
 public class QuestionActivityLast extends QuestionActivityBase {
     private Button next,prev;
+    // THÊM BIẾN NÀY
+ //   protected ImageView bookmarkButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -50,7 +52,18 @@ public class QuestionActivityLast extends QuestionActivityBase {
         topicname.setText(topic);
         backSetup(QuestionActivityLast.this);
         setCursor();
+
+        // KIỂM TRA DỮ LIỆU CƠ BẢN TRƯỚC KHI GỌI setting()
+        if (cursor == null || cursor.getCount() == 0) {
+            Toast.makeText(this, "Không tìm thấy câu hỏi nào.", Toast.LENGTH_LONG).show();
+            finish(); // Đóng Activity và quay về trước đó (MainActivity)
+            return; // Dừng hàm onCreate
+        }
+
         setting(cursor,QuestionActivityLast.this);
+        // THÊM DÒNG NÀY ĐỂ KÍCH HOẠT LOGIC BOOKMARK
+        // Hàm này sẽ thiết lập Listener và tải trạng thái bookmark ban đầu
+        setupBookmark(QuestionActivityLast.this);
         submitSetup(QuestionActivityLast.this);
     }
     @Override
@@ -71,6 +84,8 @@ public class QuestionActivityLast extends QuestionActivityBase {
         prev=findViewById(R.id.btnprevQAL);
         radioGroup=findViewById(R.id.radioBtnQAL);
         imgQuestion=findViewById(R.id.imgQAL);
+        // THÊM DÒNG NÀY (Đã sửa lại để sử dụng ImageButton/ImageView)
+        bookmarkButton = findViewById(R.id.iv_bookmark_button);
     }
     @Override
     protected void setting(Cursor cursor, Context context) {
@@ -115,6 +130,9 @@ public class QuestionActivityLast extends QuestionActivityBase {
         else {
             radioGroup.clearCheck();
             hashMap.remove(ques_id);
+        }
+        if (bookmarkButton != null) {
+            loadBookmarkState(context);
         }
     }
 }

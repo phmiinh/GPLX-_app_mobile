@@ -53,4 +53,11 @@
     <color name="answer_text_incorrect">#C62828</color>
     <color name="answer_text_selected">#3B3B3B</color>
 
-    <color name="teal_light">#B2DFDB</color>      <color name="text_link">#0000FF</color>       <color name="teal_primary">#009688</color>     </resources>
+    <color name="teal_light">#B2DFDB</color>      <color name="text_link">#0000FF</color>       <color name="teal_primary">#009688</color>
+
+    <!-- Thêm 3 màu cho tính năng Bookmark và Icon -->
+    <color name="teal_main">#009688</color>
+    <color name="gray_icon">#A9A9A9</color>
+    <color name="color_transparent">#00000000</color>
+    <color name="gray_text">#757575</color>
+</resources>

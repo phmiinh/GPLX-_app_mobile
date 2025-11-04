@@ -20,6 +20,13 @@
             android:name=".LevelActivity"
             android:exported="false" />
         <activity
+            android:name=".BookmarkActivity"
+            android:exported="false" />
+        <activity
+            android:name=".QuestionActivityBookmark"
+            android:exported="false"
+            android:label="Câu hỏi đánh dấu" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>

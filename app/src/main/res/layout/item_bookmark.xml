@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Icon Bookmark (Màu xanh ngọc) -->
+        <ImageView
+            android:id="@+id/imgBookmarkIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_bookmark_marked"
+            app:tint="@color/teal_main"
+            android:contentDescription="Đã đánh dấu" />
+
+        <!-- Thông tin Câu hỏi -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvQuestionId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Câu hỏi số 15"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTopic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chủ đề: Quy tắc giao thông đường bộ"
+                android:textColor="@color/gray_text"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Icon Mũi tên (Dấu hiệu có thể click) -->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_arrow_right"
+            app:tint="@color/gray_icon"
+            android:contentDescription="Chi tiết" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

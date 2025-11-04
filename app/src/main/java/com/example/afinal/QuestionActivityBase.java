@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,13 +16,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.afinal.analytics.AnalyticsRepository;
 import com.example.afinal.analytics.FirestoreService;
@@ -42,6 +37,9 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected  ImageButton back;
     protected  Button submit;
 
+    // Bookmark Component
+    protected ImageButton bookmarkButton; // Khai báo nút Bookmark
+
     protected SQLiteDatabase database= null;
     protected  TextView content;
     protected  RadioButton a,b,c,d;
@@ -55,10 +53,11 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected  int start,end,level,min,time,total,ques_id,critical=0,topicid;
     protected  Intent intent;
     protected  Cursor cursor=null;
+    protected boolean isBookmarked = false; // Trạng thái đánh dấu của câu hỏi hiện tại
 
     protected  HashMap<Integer,Integer>rule;
-    
-    // Firebase Analytics
+
+    // Firebase Analytics & Firestore
     protected AnalyticsRepository analyticsRepository;
     protected FirestoreService firestoreService;
     protected String sessionId;
@@ -72,7 +71,7 @@ public class QuestionActivityBase extends AppCompatActivity {
         get_from_intent();
         hashMap=new HashMap<>();
         answer=new HashMap<>();
-        
+
         // Initialize Firebase Analytics
         analyticsRepository = new AnalyticsRepository(this);
         analyticsRepository.ensureSchema();
@@ -83,23 +82,110 @@ public class QuestionActivityBase extends AppCompatActivity {
     }
     protected void get_from_intent() {
         id=intent.getStringExtra("id");
-        if(id.equals("topic")){
+        if(id != null && id.equals("topic")){
             start=intent.getIntExtra("start",1);
             end=intent.getIntExtra("end",1);
             count= end-start+1;
             topicid=intent.getIntExtra("categories_id",0);
-            Log.d("con cac", "topicid: "+topicid);
+            Log.d("Base", "topicid: "+topicid);
 
         }
-        else {
+        else if (id != null && id.equals("level")){
             level = intent.getIntExtra("level_id", 1);
             min = intent.getIntExtra("min", 1);
             count = intent.getIntExtra("total", 1);
-            Log.d("TAG", "onClick: " + count);
             time = intent.getIntExtra("time", 1);
             rule = new HashMap<>();
+        } else if (id != null && id.equals("bookmark")) {
+            // Xử lý riêng trong QuestionActivityBookmark
         }
     }
+
+    /**
+     * Hàm này được gọi để thiết lập nút Bookmark và kiểm tra trạng thái đánh dấu.
+     * Cần gọi hàm này trong onCreate() của các Activity con.
+     */
+    protected void setupBookmark(Context context) {
+        if (bookmarkButton == null) return;
+
+        // 1. Lắng nghe sự kiện click
+        bookmarkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleBookmarkState(context);
+            }
+        });
+
+        // 2. Tải trạng thái ban đầu của câu hỏi hiện tại
+        loadBookmarkState(context);
+    }
+
+    /**
+     * Tải trạng thái đánh dấu của câu hỏi hiện tại (ques_id) từ Firestore.
+     */
+    protected void loadBookmarkState(Context context) {
+        String userId = UserIdentity.getUserId(this);
+        if (ques_id > 0) {
+            firestoreService.isQuestionBookmarked(userId, ques_id, new FirestoreService.BookmarkCheckListener() {
+                @Override
+                public void onResult(boolean isMarked) {
+                    isBookmarked = isMarked;
+                    updateBookmarkIcon(context);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Bookmark", "Error checking bookmark", e);
+                    isBookmarked = false;
+                    updateBookmarkIcon(context);
+                }
+            });
+        }
+    }
+
+
+    /**
+     * Thay đổi trạng thái đánh dấu của câu hỏi hiện tại và cập nhật lên Firestore.
+     */
+    protected void toggleBookmarkState(Context context) {
+        String userId = UserIdentity.getUserId(this);
+        if (ques_id <= 0) {
+            Toast.makeText(context, "Không có câu hỏi để đánh dấu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        isBookmarked = !isBookmarked;
+
+        if (isBookmarked) {
+            firestoreService.addBookmark(userId, ques_id,
+                    aVoid -> Toast.makeText(context, "Đã thêm vào danh sách đánh dấu", Toast.LENGTH_SHORT).show(),
+                    e -> Toast.makeText(context, "Lỗi khi thêm bookmark", Toast.LENGTH_SHORT).show()
+            );
+        } else {
+            firestoreService.removeBookmark(userId, ques_id,
+                    aVoid -> Toast.makeText(context, "Đã xóa khỏi danh sách đánh dấu", Toast.LENGTH_SHORT).show(),
+                    e -> Toast.makeText(context, "Lỗi khi xóa bookmark", Toast.LENGTH_SHORT).show()
+            );
+        }
+
+        updateBookmarkIcon(context);
+    }
+
+
+    /**
+     * Cập nhật icon của nút Bookmark dựa trên trạng thái (đã đánh dấu hay chưa).
+     */
+    protected void updateBookmarkIcon(Context context) {
+        if (bookmarkButton == null) return;
+        if (isBookmarked) {
+            // Icon đã đánh dấu (Solid - Màu xanh)
+            bookmarkButton.setImageResource(R.drawable.ic_bookmark_marked);
+        } else {
+            // Icon chưa đánh dấu (Outline - Màu xám)
+            bookmarkButton.setImageResource(R.drawable.ic_bookmark_unmarked);
+        }
+    }
+
     protected void setting(Cursor cursor,Context context) {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -115,7 +201,7 @@ public class QuestionActivityBase extends AppCompatActivity {
         });
         if(cursor.moveToFirst()){
             int cnt=1;
-            if(id.equals("topic")&&topicid==7){
+            if(id != null && id.equals("topic")&&topicid==7){
                 while(true){
                     if(cnt==start) break;
                     cnt++;
@@ -127,15 +213,13 @@ public class QuestionActivityBase extends AppCompatActivity {
             Log.d("DEBUG_TAG", "Can't find data");
             finish();
         }
-
-
     }
     protected void set_content(Cursor cursor,Context context) {
         // Log attempt for previous question if there was one
-        if (questionStartAt > 0) {
+        if (questionStartAt > 0 && id != null && (id.equals("topic") || id.equals("level"))) {
             logAttemptForCurrent();
         }
-        
+
         ques_id=cursor.getInt(0);
         content.setText("Câu "+ques_id+": "+cursor.getString(2));
         a.setText(cursor.getString(6));
@@ -173,11 +257,16 @@ public class QuestionActivityBase extends AppCompatActivity {
                 Toast.makeText(context, "Không thể tải ảnh", Toast.LENGTH_SHORT).show();
             }
         }
-        
+
         // Start timing for new question
         questionStartAt = System.currentTimeMillis();
+
+        // Cập nhật trạng thái Bookmark cho câu hỏi mới
+        if (bookmarkButton != null) {
+            loadBookmarkState(context);
+        }
     }
-    
+
     protected void logAttemptForCurrent() {
         int selectedId = radioGroup.getCheckedRadioButtonId();
         if (selectedId == -1) return;
@@ -201,9 +290,9 @@ public class QuestionActivityBase extends AppCompatActivity {
         record.put("time_spent_ms", spent);
         record.put("timestamp", now);
         record.put("session_id", sessionId);
-        record.put("mode", id.equals("topic") ? "practice_topic" : "mock_exam");
+        record.put("mode", id != null && id.equals("topic") ? "practice_topic" : "mock_exam");
         record.put("has_image", hasImg);
-        
+
         // Save to local database
         analyticsRepository.insertAttempt(record);
         // Save to Firestore
@@ -218,13 +307,17 @@ public class QuestionActivityBase extends AppCompatActivity {
         firestoreService.upsertQuestionMeta(String.format(Locale.US, "%d", ques_id), qm);
     }
     protected void setCursor() {
-        if(id.equals("topic")){
+        if(id != null && id.equals("topic")){
             if(topicid<7){
                 cursor = database.query("Questions",null,"question_id BETWEEN ? AND ?",new String[]{String.valueOf(start),String.valueOf(end)},null,null,null);
             }
             else{
                 cursor = database.query("Questions",null,"is_critical=?",new String[]{"1"},null,null,"question_id asc",String.valueOf(end));
             }
+        }
+        else if(id != null && id.equals("bookmark")){
+            // Logic truy vấn sẽ được thực hiện trong QuestionActivityBookmark
+            return;
         }
         else{
             get_rule();
@@ -298,8 +391,10 @@ public class QuestionActivityBase extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        database.close();
+        // Kiểm tra tránh lỗi khi database chưa được mở (ví dụ: trong unit test)
+        if(database != null && database.isOpen()){
+            database.close();
+        }
     }
     protected void submitSetup(Context context) {
         submit.setOnClickListener(new View.OnClickListener() {
@@ -310,6 +405,8 @@ public class QuestionActivityBase extends AppCompatActivity {
                 builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        // Log nỗ lực cuối cùng trước khi nộp bài
+                        logAttemptForCurrent();
                         showpoint(context);
                     }
                 });
@@ -344,13 +441,13 @@ public class QuestionActivityBase extends AppCompatActivity {
             }
         }
         msg=String.valueOf(truecnt)+msg;
-        if(id.equals("level")){
+        if(id != null && id.equals("level")){
             msg+="\n";
             msg+="Trạng thái: ";
             if(truecnt<min) state="Trượt";
             msg+=state;
         }
-        
+
         // Save exam session to Firebase
         Map<String, Object> session = new HashMap<>();
         String userId = UserIdentity.getUserId(this);
@@ -368,7 +465,7 @@ public class QuestionActivityBase extends AppCompatActivity {
         session.put("num_liet_wrong", numCriticalWrong);
         analyticsRepository.upsertExamSession(session);
         firestoreService.saveExamSession(session);
-        
+
         builder1.setMessage(msg);
         builder1.setNegativeButton("Thoát", new DialogInterface.OnClickListener() {
             @Override
@@ -392,7 +489,7 @@ public class QuestionActivityBase extends AppCompatActivity {
     }
     protected   void getfullques(){
         cursor.moveToFirst();
-        if(id.equals("topic")&&topicid==7){
+        if(id != null && id.equals("topic")&&topicid==7){
             int cnt=1;
             while(true){
                 if(cnt==start) break;
@@ -405,7 +502,7 @@ public class QuestionActivityBase extends AppCompatActivity {
             cursor.moveToNext();
         }
     }
-    
+
     protected String buildBlueprintUsed() {
         if (rule == null || rule.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
@@ -442,6 +539,5 @@ public class QuestionActivityBase extends AppCompatActivity {
                 alertDialog.show();
             }
         });
-
     }
 }
