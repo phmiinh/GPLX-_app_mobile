@@ -56,6 +56,7 @@ public class QuestionActivityBase extends AppCompatActivity {
 
 
 
+
     protected void init(){
         intent=getIntent();
         startTime=getTime();
