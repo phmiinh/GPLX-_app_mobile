@@ -26,6 +26,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.afinal.DAO.CategoriesDAO;
 import com.example.afinal.adapter.LevelAdapter;
+import com.example.afinal.analytics.AuthInitializer;
 import com.example.afinal.dbclass.Categories;
 import com.example.afinal.adapter.CategoriesAdapter;
 import com.example.afinal.dbclass.Level;
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         init();
+
+        // Initialize Firebase Anonymous Auth for analytics
+        AuthInitializer.ensureAnonymousSignIn();
 
         setMenu();
         tabmainsetup();
@@ -115,6 +119,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(MainActivity.this,TopicActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        TextView bookmarked = popup.findViewById(R.id.textView7);
+        bookmarked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, BookmarksActivity.class);
                 startActivity(intent);
             }
         });

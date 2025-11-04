@@ -71,6 +71,8 @@ public class QuestionActivityLast extends QuestionActivityBase {
         prev=findViewById(R.id.btnprevQAL);
         radioGroup=findViewById(R.id.radioBtnQAL);
         imgQuestion=findViewById(R.id.imgQAL);
+        bookmarkButton=findViewById(R.id.iv_bookmark_button);
+        setupBookmarkButton();
     }
     @Override
     protected void setting(Context context) {
