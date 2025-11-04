@@ -51,10 +51,10 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected SQLiteDatabase database= null;
     protected  RadioButton a,b,c,d;
     protected ImageView imgQuestion;
-    protected  String  img_url="",id,state="Trượt",msg, startTime,endTime;;
+    protected  String  img_url="",id,state="Trượt",msg, startTime,endTime,ans;
     protected ImageView bookmarkButton;
     protected  RadioGroup radioGroup;
-    protected  int start,end,level,min,time,topicid,count,anInt = 0;
+    protected  int start,end,level,min,time,topicid,count,anInt = 0,ques_id,topicId1,is_critical;
     protected  Intent intent;
     protected  HashMap<Integer,Integer>rule;
     protected ArrayList<Question> listQuestion;
@@ -158,15 +158,15 @@ public class QuestionActivityBase extends AppCompatActivity {
         content.setText(question.getContent());
         a.setText(question.getA());
         b.setText(question.getB());
-    
+        ans=question.getAnswer();
         if (questionStartAt > 0) {
             logAttemptForCurrent();
         }
-        
+        is_critical=question.getIs_critical();
         // Increment order in session
         orderInSession++;
-        
-        ques_id=1;
+        topicId1=question.getTopic_id();
+        ques_id=question.getId();
         
         c.setVisibility(View.VISIBLE);
         d.setVisibility(View.VISIBLE);
@@ -216,7 +216,7 @@ public class QuestionActivityBase extends AppCompatActivity {
         // Database column: category_id → Firebase field: topic_id (same concept, different naming)
         int topicId = 0;
         try {
-            topicId = cursor.getInt(1);  // Index 1 = category_id column in Questions table
+            topicId = topicId1;  // Index 1 = category_id column in Questions table
         } catch (Exception ignored) {}
 
         Map<String, Object> record = new HashMap<>();
@@ -252,7 +252,9 @@ public class QuestionActivityBase extends AppCompatActivity {
         // Save question meta
         Map<String, Object> qm = new HashMap<>();
         qm.put("topic_id", topicId);
-        boolean isCritical = cursor.getInt(4) == 1;
+        boolean isCritical;
+        if(is_critical==0) isCritical=false;
+        else isCritical=true;
         qm.put("is_critical", isCritical);
         qm.put("has_image", hasImg);
         analyticsRepository.upsertQuestionMeta(String.valueOf(ques_id), topicId, isCritical, hasImg);
@@ -342,7 +344,7 @@ public class QuestionActivityBase extends AppCompatActivity {
     }
     protected void showpoint(Context context) {
         // Log last question attempt if not already logged
-        if (questionStartAt > 0 && cursor != null) {
+        if (questionStartAt > 0 ) {
             logAttemptForCurrent();
         }
         

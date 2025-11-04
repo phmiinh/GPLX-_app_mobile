@@ -120,7 +120,6 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     explain.setText("");
                     next.setText("Kiểm tra");
                     set_content(listQuestion.get(anInt),context);
-                    answer.put(ques_id,ans);
                     if (btnAIExplain != null) {
                         btnAIExplain.setVisibility(View.GONE);
                     }
