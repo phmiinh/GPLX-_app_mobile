@@ -55,6 +55,7 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
+
     protected void init(){
         intent=getIntent();
         startTime=getTime();
