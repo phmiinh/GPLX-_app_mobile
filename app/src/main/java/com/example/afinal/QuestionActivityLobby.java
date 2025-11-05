@@ -143,6 +143,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
         });
     }
 
+
     private String getChoice() {
         int id=radioGroup.getCheckedRadioButtonId();
         if(id==-1) return "";
