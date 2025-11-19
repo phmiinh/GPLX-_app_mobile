@@ -29,16 +29,24 @@
 
         <TextView
             android:id="@+id/txtTopicQAN"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:text="Tên chủ đề"
+            android:gravity="center"
+            android:text="Hạng A"
+            android:layout_weight="1"
             android:textColor="@color/text_on_dark"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtQANtimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20:00"
+            android:textColor="#E91E63"
+            android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/iv_bookmark_button"
@@ -144,12 +152,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:text="3. Khổ giới hạn của đường bộ là khoảng trống có kích thước giới hạn về chiều rộng, chiều cao của đường bộ để các xe, bao gồm cả hàng hoá xếp trên xe đi qua được an toàn và được xác định theo quy chuẩn, tiêu chuẩn kỹ thuật của đường bộ."
-                        android:textSize="16sp"
-                        android:textColor="@color/text_primary"
-                        android:padding="12dp"
                         android:background="@drawable/answer_state"
-                        android:button="@null" />
+                        android:button="@null"
+                        android:padding="12dp"
+                        android:text="3. Khổ giới hạn của đường bộ là khoảng trống có kích thước giới hạn về chiều rộng, chiều cao của đường bộ để các xe, bao gồm cả hàng hoá xếp trên xe đi qua được an toàn và được xác định theo quy chuẩn, tiêu chuẩn kỹ thuật của đường bộ."
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp" />
 
                     <RadioButton
                         android:id="@+id/radiobtnQANd"
@@ -157,6 +165,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:text="4. Đáp án D"
+
                         android:textSize="16sp"
                         android:textColor="@color/text_primary"
                         android:padding="12dp"
@@ -205,13 +214,14 @@
                 android:id="@+id/btnnextQAN"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Kiểm tra"
-                android:textSize="16sp"
-                android:textStyle="bold"
                 android:background="@drawable/btn_primary"
-                android:textColor="@color/button_text"
                 android:paddingTop="12dp"
-                android:paddingBottom="12dp" />
+                android:paddingBottom="12dp"
+                android:text="Kiểm tra"
+                app:backgroundTint="@null"
+                android:textColor="@color/button_text"
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>

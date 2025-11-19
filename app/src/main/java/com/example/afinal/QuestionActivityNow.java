@@ -54,6 +54,7 @@ public class QuestionActivityNow extends QuestionActivityBase {
         backSetup(QuestionActivityNow.this);
         setting(QuestionActivityNow.this);
         submitSetup(QuestionActivityNow.this);
+        settingtimer(QuestionActivityNow.this);
     }
     @Override
     protected void init(){
@@ -74,6 +75,7 @@ public class QuestionActivityNow extends QuestionActivityBase {
         submit=findViewById(R.id.btnQAN_submit);
         back=findViewById(R.id.btnBackQAN);
         bookmarkButton=findViewById(R.id.iv_bookmark_button);
+        timer=findViewById(R.id.txtQANtimer);
         setupBookmarkButton();
         btnAIExplain=findViewById(R.id.btnAIExplain);
         if (btnAIExplain != null) {

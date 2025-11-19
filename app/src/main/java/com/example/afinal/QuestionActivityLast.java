@@ -52,6 +52,7 @@ public class QuestionActivityLast extends QuestionActivityBase {
         backSetup(QuestionActivityLast.this);
         setting(QuestionActivityLast.this);
         submitSetup(QuestionActivityLast.this);
+        settingtimer(QuestionActivityLast.this);
     }
     @Override
     protected void init(){
@@ -72,6 +73,7 @@ public class QuestionActivityLast extends QuestionActivityBase {
         radioGroup=findViewById(R.id.radioBtnQAL);
         imgQuestion=findViewById(R.id.imgQAL);
         bookmarkButton=findViewById(R.id.iv_bookmark_button);
+        timer=findViewById(R.id.txtQALtimer);
         setupBookmarkButton();
     }
     @Override

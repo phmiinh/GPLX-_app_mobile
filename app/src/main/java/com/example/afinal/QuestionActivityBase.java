@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -45,7 +46,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class QuestionActivityBase extends AppCompatActivity {
-    protected  TextView topicname,content;
+    protected  TextView topicname,content,timer;
     protected  ImageButton back;
     protected  Button submit;
     protected SQLiteDatabase database= null;
@@ -61,6 +62,7 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected QuestionDAO questionDAO;
     protected SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    protected CountDownTimer countDownTimer;
 
 
     
@@ -131,6 +133,7 @@ public class QuestionActivityBase extends AppCompatActivity {
             count = intent.getIntExtra("total", 1);
             Log.d("TAG", "onClick: " + count);
             time = intent.getIntExtra("time", 1);
+            time*=60000;
             sessionDurationMs = time * 60 * 1000L;  // Convert minutes to ms
             rule = new HashMap<>();
         }
@@ -152,6 +155,7 @@ public class QuestionActivityBase extends AppCompatActivity {
             Log.d("DEBUG_TAG", "Can't find data");
             finish();
         }
+
     }
     protected void set_content(Question question,Context context) {
 
@@ -202,7 +206,36 @@ public class QuestionActivityBase extends AppCompatActivity {
         // Refresh bookmark icon for current question
         refreshBookmarkIcon();
     }
-    
+
+    protected void settingtimer(Context context) {
+        if(id.equals("topic")){
+            timer.setVisibility(View.GONE);
+            return;
+        }
+        else{
+            timer.setVisibility(View.VISIBLE);
+            //time/=60;
+            countDownTimer=new CountDownTimer((long)time,1000) {
+                @Override
+                public void onFinish() {
+                    timer.setText("00:00");
+                    showpoint(context);
+                }
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    long min=millisUntilFinished/60000;
+                    long sec=(millisUntilFinished/1000)%60;
+                    timer.setText(String.format("%02d",min)+":"+String.format("%02d",sec));
+
+                }
+            };
+            countDownTimer.start();
+
+            return;
+        }
+    }
+
     protected void logAttemptForCurrent() {
         int selectedId = radioGroup.getCheckedRadioButtonId();
         boolean skipped = (selectedId == -1);
@@ -314,7 +347,9 @@ public class QuestionActivityBase extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
         database.close();
     }
     protected void submitSetup(Context context) {
