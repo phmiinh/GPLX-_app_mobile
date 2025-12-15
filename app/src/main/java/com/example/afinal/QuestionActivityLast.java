@@ -57,6 +57,13 @@ public class QuestionActivityLast extends QuestionActivityBase {
     @Override
     protected void init(){
         super.init();
+        // If SmartPracticeActivity provided a prepared question list, reuse it
+        ArrayList<Question> provided = QuestionHolder.consumeQuestions();
+        if (provided != null && !provided.isEmpty()) {
+            listQuestion = provided;
+            count = listQuestion.size();
+            start = 1;
+        }
         find_view();
     }
     private void find_view() {

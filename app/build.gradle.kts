@@ -27,6 +27,9 @@ android {
         }
         val geminiKey = props.getProperty("GEMINI_API_KEY") ?: ""
         buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKey\"")
+
+        val aiApiBaseUrl = props.getProperty("AI_API_BASE_URL") ?: "http://10.0.2.2:8000"
+        buildConfigField("String", "AI_API_BASE_URL", "\"$aiApiBaseUrl\"")
     }
 
     buildTypes {

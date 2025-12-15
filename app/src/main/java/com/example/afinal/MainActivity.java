@@ -182,15 +182,19 @@ public class MainActivity extends AppCompatActivity {
         tabmain=findViewById(R.id.tab_main);
         tabmain.setup();
 
-        TabHost.TabSpec spec_topic,spec_level;
+        TabHost.TabSpec spec_topic,spec_level,spec_smart;
         spec_topic=tabmain.newTabSpec("topic");
         spec_level=tabmain.newTabSpec("level");
+        spec_smart=tabmain.newTabSpec("smart");
         spec_level.setContent(R.id.tab_level_main);
         spec_topic.setContent(R.id.tab_topic_main);
+        spec_smart.setContent(R.id.tab_smart_main);
         spec_topic.setIndicator("Luyện tập");
         spec_level.setIndicator("Thi thử");
+        spec_smart.setIndicator("Ôn thông minh (AI)");
         tabmain.addTab(spec_topic);
         tabmain.addTab(spec_level);
+        tabmain.addTab(spec_smart);
 
     }
     private void processCopy() {

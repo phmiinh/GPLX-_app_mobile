@@ -21,7 +21,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class QuestionActivityLobby extends AppCompatActivity {
-    private TextView name,num,info;
+    private TextView name,num,info,modeLabel;
     private EditText start,end;
     private ImageButton back;
     private Button run,all;
@@ -88,6 +88,7 @@ public class QuestionActivityLobby extends AppCompatActivity {
         info=findViewById(R.id.txtLobbyinfo);
         start=findViewById(R.id.txtLobbyStart);
         end=findViewById(R.id.txtLobbyEnd);
+        modeLabel=findViewById(R.id.textView8);
     }
 
     private void choose_all_setting() {
@@ -109,17 +110,23 @@ public class QuestionActivityLobby extends AppCompatActivity {
                     Toast.makeText(QuestionActivityLobby.this, "Vui lòng nhập bắt đầu và kết thúc hợp lệ", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    String s = getChoice();
-                    if(s.equals("")) {
-                        Toast.makeText(QuestionActivityLobby.this, "Vui lòng chọn hình thức!", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
                     Intent nextIntent;
-                    if(s.equals("Xem đáp án sau khi hoàn thành bài thi")){
+                    // Topic mode: respect user choice (xem đáp án ngay / xem sau)
+                    if (id.equals("topic")) {
+                        String s = getChoice();
+                        if(s.equals("")) {
+                            Toast.makeText(QuestionActivityLobby.this, "Vui lòng chọn hình thức!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if(s.equals("Xem đáp án sau khi hoàn thành bài thi")){
+                            nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityLast.class);
+                        }
+                        else {
+                            nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityNow.class);
+                        }
+                    } else {
+                        // Level (mock exam by license): always do full exam, see answers only at the end
                         nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityLast.class);
-                    }
-                    else {
-                        nextIntent = new Intent(QuestionActivityLobby.this,QuestionActivityNow.class);
                     }
                     String name=intent.getStringExtra("name");
                     nextIntent.putExtra("name",name);
@@ -167,12 +174,17 @@ public class QuestionActivityLobby extends AppCompatActivity {
             end.setHint("Tối đa: "+String.valueOf(max));
             choice.setVisibility(View.VISIBLE);
             info.setText("Đầu tiên, nhập câu hỏi bắt đầu và kết thúc mà bạn muốn ôn tập.");
+            modeLabel.setVisibility(View.VISIBLE);
+            radioGroup.setVisibility(View.VISIBLE);
         }
         else{
             name.setText("Hạng "+intent.getStringExtra("name"));
             choice.setVisibility(View.GONE);
             num.setText(String.valueOf(total)+" câu");
             info.setText("Cần đúng ít nhất: "+min+"\n"+"Thời gian: "+time+" phút.");
+            // Hide practice mode choice for mock exam by license level
+            modeLabel.setVisibility(View.GONE);
+            radioGroup.setVisibility(View.GONE);
         }
     }
 }

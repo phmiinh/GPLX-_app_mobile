@@ -46,26 +46,24 @@ import java.util.Map;
 import java.util.UUID;
 
 public class QuestionActivityBase extends AppCompatActivity {
-    protected  TextView topicname,content,timer;
-    protected  ImageButton back;
-    protected  Button submit;
-    protected SQLiteDatabase database= null;
-    protected  RadioButton a,b,c,d;
+    protected TextView topicname, content, timer;
+    protected ImageButton back;
+    protected Button submit;
+    protected SQLiteDatabase database = null;
+    protected RadioButton a, b, c, d;
     protected ImageView imgQuestion;
-    protected  String  img_url="",id,state="Trượt",msg, startTime,endTime,ans;
+    protected String img_url = "", id, state = "Trượt", msg, startTime, endTime, ans;
     protected ImageView bookmarkButton;
-    protected  RadioGroup radioGroup;
-    protected  int start,end,level,min,time,topicid,count,anInt = 0,ques_id,topicId1,is_critical;
-    protected  Intent intent;
-    protected  HashMap<Integer,Integer>rule;
+    protected RadioGroup radioGroup;
+    protected int start, end, level, min, time, topicid, count, anInt = 0, ques_id, topicId1, is_critical;
+    protected Intent intent;
+    protected HashMap<Integer, Integer> rule;
     protected ArrayList<Question> listQuestion;
     protected QuestionDAO questionDAO;
     protected SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     protected CountDownTimer countDownTimer;
 
-
-    
     // Firebase Analytics
     protected AnalyticsRepository analyticsRepository;
     protected FirestoreService firestoreService;
@@ -75,8 +73,17 @@ public class QuestionActivityBase extends AppCompatActivity {
     protected int orderInSession = 0;  // Track order of question in session (starts at 0, becomes 1+ when logging)
     protected long sessionDurationMs = 0;  // Total session duration for mock_exam
     protected HashMap<Integer, Integer> questionAttemptCounts = new HashMap<>();  // Track attempts per question for auto-bookmark
-
-
+    /**
+     * Indicates whether the user requested an AI/hint explanation for
+     * the current question. Consumed inside logAttemptForCurrent and
+     * reset whenever a new question is displayed.
+     */
+    protected boolean aiUsedForCurrentQuestion = false;
+    /**
+     * Logical mode label for analytics: e.g. "practice_topic", "mock_exam",
+     * "ai_practice", "ai_mock_exam". If null, we infer from id ("topic"/"level").
+     */
+    protected String sessionMode;
     protected void init(){
         intent=getIntent();
         startTime=getTime();
@@ -119,6 +126,8 @@ public class QuestionActivityBase extends AppCompatActivity {
     }
     protected void get_from_intent() {
         id=intent.getStringExtra("id");
+        // Optional higher-level session mode passed from callers (e.g. AI practice)
+        sessionMode = intent.getStringExtra("ai_mode");
         if(id.equals("topic")){
             start=intent.getIntExtra("start",1);
             end=intent.getIntExtra("end",1);
@@ -157,8 +166,7 @@ public class QuestionActivityBase extends AppCompatActivity {
         }
 
     }
-    protected void set_content(Question question,Context context) {
-
+    protected void set_content(Question question, Context context) {
         content.setText(question.getContent());
         a.setText(question.getA());
         b.setText(question.getB());
@@ -202,7 +210,8 @@ public class QuestionActivityBase extends AppCompatActivity {
         
         // Start timing for new question
         questionStartAt = System.currentTimeMillis();
-
+        // Reset AI usage flag for the new question
+        aiUsedForCurrentQuestion = false;
         // Refresh bookmark icon for current question
         refreshBookmarkIcon();
     }
@@ -260,7 +269,12 @@ public class QuestionActivityBase extends AppCompatActivity {
         record.put("time_spent_ms", spent);
         record.put("timestamp_ms", now);  // Renamed from timestamp
         record.put("session_id", sessionId);
-        String mode = id.equals("topic") ? "practice_topic" : "mock_exam";
+        String mode;
+        if (sessionMode != null && !sessionMode.isEmpty()) {
+            mode = sessionMode;
+        } else {
+            mode = id.equals("topic") ? "practice_topic" : "mock_exam";
+        }
         record.put("mode", mode);
         record.put("has_image", hasImg);
         
@@ -274,7 +288,7 @@ public class QuestionActivityBase extends AppCompatActivity {
             record.put("remaining_time_ratio", Math.max(0.0, Math.min(1.0, ratio)));
         }
         record.put("time_of_day_bucket", getTimeOfDayBucket());
-        record.put("hint_or_ai_used", false);  // TODO: Implement when AI hint feature is added
+        record.put("hint_or_ai_used", aiUsedForCurrentQuestion);
         record.put("skipped", skipped);
         
         // Save to local database
@@ -421,9 +435,19 @@ public class QuestionActivityBase extends AppCompatActivity {
         session.put("duration_ms", now - sessionStartAt);
         // blueprint_json as Map (preferred) or legacy string format
         if (id.equals("level") && rule != null && !rule.isEmpty()) {
-            session.put("blueprint_json", buildBlueprintJson());  // Map format
+            // Normal mock exam using blueprint rule
+            session.put("blueprint_json", buildBlueprintJson());
+        } else if (sessionMode != null && sessionMode.equals("ai_mock_exam") && listQuestion != null) {
+            // AI mock exam: derive blueprint from actual recommended questions
+            HashMap<String, Integer> blueprintAi = new HashMap<>();
+            for (Question q : listQuestion) {
+                String key = String.valueOf(q.getTopic_id());
+                int current = blueprintAi.containsKey(key) ? blueprintAi.get(key) : 0;
+                blueprintAi.put(key, current + 1);
+            }
+            session.put("blueprint_json", blueprintAi);
         } else {
-            // For practice_topic, blueprint_json is null or empty
+            // For practice_topic and AI practice, keep blueprint empty
             session.put("blueprint_json", new HashMap<String, Integer>());
         }
         session.put("score_raw", truecnt);

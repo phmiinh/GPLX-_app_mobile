@@ -124,4 +124,45 @@ public class QuestionDAO extends DAO{
         return  arrayList;
     }
 
+    /**
+     * Returns questions matching the given question_id list. The result order
+     * follows the order of the provided ids as closely as possible.
+     */
+    public ArrayList<Question> getQuestionsByIds(java.util.List<String> ids) {
+        ArrayList<Question> result = new ArrayList<>();
+        if (ids == null || ids.isEmpty()) {
+            return result;
+        }
+        StringBuilder placeholders = new StringBuilder();
+        String[] args = new String[ids.size()];
+        for (int i = 0; i < ids.size(); i++) {
+            if (i > 0) placeholders.append(",");
+            placeholders.append("?");
+            args[i] = ids.get(i);
+        }
+        Cursor cursor = database.rawQuery(
+                "SELECT * FROM Questions WHERE question_id IN (" + placeholders + ")",
+                args
+        );
+        java.util.HashMap<Integer, Question> map = new java.util.HashMap<>();
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                Question q = getQuestionFromCursor(cursor);
+                map.put(q.getId(), q);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        for (String idStr : ids) {
+            try {
+                int key = Integer.parseInt(idStr);
+                Question q = map.get(key);
+                if (q != null) {
+                    result.add(q);
+                }
+            } catch (NumberFormatException ignored) { }
+        }
+        return result;
+    }
+
 }

@@ -121,6 +121,16 @@
                     <include layout="@layout/layout_level"></include>
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/tab_smart_main"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <include layout="@layout/activity_smart_practice" />
+                </LinearLayout>
+
             </FrameLayout>
         </LinearLayout>
     </TabHost>

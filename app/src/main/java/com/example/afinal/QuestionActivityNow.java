@@ -49,8 +49,11 @@ public class QuestionActivityNow extends QuestionActivityBase {
         });
         init();
         String topic=intent.getStringExtra("name");
-        if(id.equals("topic")) topicname.setText(topic);
-        else topicname.setText("Hạng "+topic);
+        if(id.equals("topic")) {
+            topicname.setText(topic);
+        } else {
+            topicname.setText("Hạng " + topic);
+        }
         backSetup(QuestionActivityNow.this);
         setting(QuestionActivityNow.this);
         submitSetup(QuestionActivityNow.this);
@@ -59,6 +62,13 @@ public class QuestionActivityNow extends QuestionActivityBase {
     @Override
     protected void init(){
         super.init();
+        // If SmartPracticeActivity provided a prepared question list, reuse it
+        ArrayList<Question> provided = QuestionHolder.consumeQuestions();
+        if (provided != null && !provided.isEmpty()) {
+            listQuestion = provided;
+            count = listQuestion.size();
+            start = 1;
+        }
         find_view();
     }
     private void find_view() {
@@ -94,16 +104,13 @@ public class QuestionActivityNow extends QuestionActivityBase {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id=radioGroup.getCheckedRadioButtonId();
-                if(id==-1){
-                    Toast.makeText(QuestionActivityNow.this, "Hãy chọn đáp án trước", Toast.LENGTH_SHORT).show();
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+                if (selectedId == -1){
+                    Toast.makeText(QuestionActivityNow.this, "Vui lòng chọn đáp án trước khi kiểm tra.", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if(next.getText().toString().equals("Kiểm tra")){
-                    explain.setText("Giải thích: "+listQuestion.get(anInt).getExplain());
-                    // Log attempt before showing answer
-                    logAttemptForCurrent();
-                    // Highlight correct (green) and incorrect (red) answers
+                    explain.setText("Giải thích: " + listQuestion.get(anInt).getExplain());
                     if (btnAIExplain != null) {
                         btnAIExplain.setVisibility(View.VISIBLE);
                         btnAIExplain.setEnabled(true);
@@ -145,8 +152,13 @@ public class QuestionActivityNow extends QuestionActivityBase {
 
     private void requestAiExplanationForCurrent() {
         if (btnAIExplain == null) return;
+        // Yêu cầu người dùng chọn đáp án trước khi gọi AI
+        if (radioGroup.getCheckedRadioButtonId() == -1) {
+            Toast.makeText(this, "Vui lòng chọn đáp án trước khi yêu cầu AI giải thích.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         btnAIExplain.setEnabled(false);
-        btnAIExplain.setText("Đang giải thích...");
+        btnAIExplain.setText("Đang gọi AI giải thích...");
 
         final String questionText = content.getText().toString();
         final String optionA = a.getText().toString();
@@ -160,18 +172,20 @@ public class QuestionActivityNow extends QuestionActivityBase {
             public void run() {
                 try {
                     StringBuilder prompt = new StringBuilder();
-                    prompt.append("Giải thích đáp án chi tiết bằng tiếng Việt, ngắn gọn, dễ hiểu.\n");
+                    prompt.append("You are an expert Vietnamese driving-license instructor. ");
+                    prompt.append("Explain the following multiple-choice question in SHORT, clear Vietnamese. ");
+                    prompt.append("First, restate the question very briefly. ");
+                    prompt.append("Then explain why the correct option is correct and why the other options are wrong. ");
+                    prompt.append("Focus on key rules and exam tips. Answer only in Vietnamese.\n\n");
                     prompt.append(questionText).append("\n");
-                    prompt.append(optionA).append("\n");
-                    prompt.append(optionB).append("\n");
-                    if (optionC != null) prompt.append(optionC).append("\n");
-                    if (optionD != null) prompt.append(optionD).append("\n");
-                    prompt.append("Chỉ ra vì sao đáp án đúng là đúng, và vì sao các đáp án khác sai.");
+                    prompt.append("A. ").append(optionA).append("\n");
+                    prompt.append("B. ").append(optionB).append("\n");
+                    if (optionC != null) prompt.append("C. ").append(optionC).append("\n");
+                    if (optionD != null) prompt.append("D. ").append(optionD).append("\n");
 
                     GeminiApiManager api = new GeminiApiManager();
                     String aiText;
                     if (hasImg) {
-                        // Load image bytes from assets
                         String assetPath = img_url; // already "img/<file>.png"
                         byte[] bytes;
                         try (InputStream is = getAssets().open(assetPath)) {
@@ -189,10 +203,12 @@ public class QuestionActivityNow extends QuestionActivityBase {
                         public void run() {
                             if (!result.isEmpty()) {
                                 String prev = explain.getText() == null ? "" : explain.getText().toString();
-                                String merged = prev.isEmpty() ? ("AI: " + result) : (prev + "\n\nAI: " + result);
+                                String merged = prev.isEmpty() ? ("AI giải thích:\n" + result) : (prev + "\n\nAI giải thích:\n" + result);
                                 explain.setText(merged);
+                                // Mark that AI was used for this question so analytics can capture it
+                                aiUsedForCurrentQuestion = true;
                             } else {
-                                Toast.makeText(QuestionActivityNow.this, "AI không trả về nội dung.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(QuestionActivityNow.this, "AI chưa trả về nội dung. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show();
                             }
                             btnAIExplain.setEnabled(true);
                             btnAIExplain.setText("AI giải thích");
@@ -202,7 +218,7 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(QuestionActivityNow.this, "Lỗi gọi AI: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(QuestionActivityNow.this, "Không kết nối được tới dịch vụ AI. Vui lòng kiểm tra mạng hoặc API key và thử lại.", Toast.LENGTH_LONG).show();
                             btnAIExplain.setEnabled(true);
                             btnAIExplain.setText("AI giải thích");
                         }
