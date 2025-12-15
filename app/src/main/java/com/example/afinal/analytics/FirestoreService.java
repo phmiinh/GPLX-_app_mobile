@@ -91,6 +91,28 @@ public class FirestoreService {
         });
         return task;
     }
+
+    /**
+     * Upsert basic user profile for leaderboard / personalization.
+     * Data map is merged into existing document if present.
+     */
+    public Task<Void> upsertUser(String userId, Map<String, Object> data) {
+        Log.d(TAG, "Upserting user profile for userId: " + userId + " data=" + data);
+        Task<Void> task = db.collection("users").document(userId).set(new HashMap<>(data), com.google.firebase.firestore.SetOptions.merge());
+        task.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "User profile upserted successfully for userId: " + userId);
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG, "Error upserting user profile for userId: " + userId, e);
+            }
+        });
+        return task;
+    }
 }
 
 

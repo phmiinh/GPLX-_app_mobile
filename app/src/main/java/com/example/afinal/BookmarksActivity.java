@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +21,9 @@ import com.example.afinal.dbclass.Question;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class BookmarksActivity extends AppCompatActivity {
     private ListView listView;
@@ -37,6 +41,13 @@ public class BookmarksActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser == null || firebaseUser.isAnonymous()) {
+            Toast.makeText(this, "Vui lòng đăng nhập để xem danh sách câu hỏi đã đánh dấu", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
         analyticsRepository = new AnalyticsRepository(this);

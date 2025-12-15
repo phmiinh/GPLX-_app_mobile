@@ -16,6 +16,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.example.afinal.analytics.FirestoreService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -35,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private int failedAttempts = 0;
     private FirebaseAuth mAuth;
+    private FirestoreService firestoreService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        firestoreService = new FirestoreService();
         prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
 
         // Ánh xạ View
@@ -67,7 +74,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         btnSkip.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            // Skip to dashboard as anonymous user
+            Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
             startActivity(intent);
             finish();
         });
@@ -148,7 +156,18 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         resetFailedAttempts();
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        // Upsert basic profile info for leaderboard
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            Map<String, Object> profile = new HashMap<>();
+                            if (user.getDisplayName() != null && !user.getDisplayName().isEmpty()) {
+                                profile.put("display_name", user.getDisplayName());
+                            }
+                            profile.put("email", user.getEmail());
+                            profile.put("last_login_ms", System.currentTimeMillis());
+                            firestoreService.upsertUser(user.getUid(), profile);
+                        }
+                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                         startActivity(intent);
                         finish();
                     } else {

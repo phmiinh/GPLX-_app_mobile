@@ -14,6 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth; // <-- Thêm thư viện Firebase Auth
+import com.google.firebase.auth.FirebaseUser;
+import com.example.afinal.analytics.FirestoreService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -27,6 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout layoutConfirmPassword;
 
     private FirebaseAuth mAuth;
+    private FirestoreService firestoreService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
+        firestoreService = new FirestoreService();
 
 
         etUsername = findViewById(R.id.et_username_register);
@@ -110,6 +117,14 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            Map<String, Object> profile = new HashMap<>();
+                            profile.put("display_name", username);
+                            profile.put("email", email);
+                            profile.put("created_at_ms", System.currentTimeMillis());
+                            firestoreService.upsertUser(user.getUid(), profile);
+                        }
                         Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                         startActivity(intent);

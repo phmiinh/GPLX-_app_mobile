@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         setMenu();
         tabmainsetup();
+        selectDefaultTabFromIntent();
         tab_topic_setup();
         tab_level_setup();
         //Minhbuscu
@@ -129,6 +130,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, BookmarksActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        TextView history = popup.findViewById(R.id.textView9);
+        history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Placeholder: could navigate to dashboard or a future history screen
+                Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
                 startActivity(intent);
             }
         });
@@ -196,6 +207,18 @@ public class MainActivity extends AppCompatActivity {
         tabmain.addTab(spec_level);
         tabmain.addTab(spec_smart);
 
+    }
+
+    private void selectDefaultTabFromIntent() {
+        String defaultTab = getIntent().getStringExtra("default_tab");
+        if (defaultTab == null) return;
+        if (defaultTab.equals("topic")) {
+            tabmain.setCurrentTabByTag("topic");
+        } else if (defaultTab.equals("level")) {
+            tabmain.setCurrentTabByTag("level");
+        } else if (defaultTab.equals("smart")) {
+            tabmain.setCurrentTabByTag("smart");
+        }
     }
     private void processCopy() {
 

@@ -31,6 +31,8 @@ import com.example.afinal.dbclass.Question;
 import com.example.afinal.analytics.AnalyticsRepository;
 import com.example.afinal.analytics.FirestoreService;
 import com.example.afinal.analytics.UserIdentity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -329,6 +331,11 @@ public class QuestionActivityBase extends AppCompatActivity {
      * Save bookmark to local and Firestore
      */
     protected void saveBookmark(String questionId, String reason) {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser == null || firebaseUser.isAnonymous()) {
+            Toast.makeText(this, "Vui lòng đăng nhập để sử dụng tính năng đánh dấu câu hỏi", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String userId = UserIdentity.getUserId(this);
         long now = System.currentTimeMillis();
         
@@ -337,6 +344,7 @@ public class QuestionActivityBase extends AppCompatActivity {
         bookmark.put("question_id", questionId);
         bookmark.put("reason", reason);
         bookmark.put("created_at_ms", now);
+        Log.d("Bookmark", "Saving bookmark: " + bookmark);
         
         // Save to local database
         analyticsRepository.insertBookmark(userId, questionId, reason);
@@ -572,13 +580,19 @@ public class QuestionActivityBase extends AppCompatActivity {
 
     protected void toggleBookmark() {
         if (analyticsRepository == null) return;
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser == null || firebaseUser.isAnonymous()) {
+            Toast.makeText(this, "Vui lòng đăng nhập để sử dụng tính năng đánh dấu câu hỏi", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String userId = UserIdentity.getUserId(this);
         boolean marked = analyticsRepository.isBookmarked(userId, String.valueOf(ques_id));
         if (marked) {
             analyticsRepository.deleteBookmark(userId, String.valueOf(ques_id));
             Toast.makeText(this, "Đã bỏ đánh dấu", Toast.LENGTH_SHORT).show();
         } else {
-            analyticsRepository.insertBookmark(userId, String.valueOf(ques_id), "important");
+            // Use common saveBookmark method so it syncs to Firestore
+            saveBookmark(String.valueOf(ques_id), "important");
             Toast.makeText(this, "Đã đánh dấu câu hỏi", Toast.LENGTH_SHORT).show();
         }
         refreshBookmarkIcon();

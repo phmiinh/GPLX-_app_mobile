@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_leaderboard"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_primary"
+    tools:context=".LeaderboardActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_gradient">
+
+        <ImageButton
+            android:id="@+id/btnLeaderboardBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_null"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+        <TextView
+            android:id="@+id/txtLeaderboardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bảng xếp hạng"
+            android:textSize="20sp"
+            android:paddingStart="16dp"
+            android:textColor="@color/text_on_dark"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Placeholder content; will be replaced with RecyclerView and tabs -->
+    <TextView
+        android:id="@+id/txtLeaderboardPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:text="Danh sách xếp hạng sẽ hiển thị ở đây."
+        android:textSize="16sp" />
+
+</LinearLayout>
+
+
