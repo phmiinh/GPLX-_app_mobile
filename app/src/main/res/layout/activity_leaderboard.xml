@@ -35,14 +35,21 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Placeholder content; will be replaced with RecyclerView and tabs -->
-    <TextView
-        android:id="@+id/txtLeaderboardPlaceholder"
+    <!-- Placeholder content wrapped in ScrollView for long leaderboards -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="24dp"
-        android:text="Danh sách xếp hạng sẽ hiển thị ở đây."
-        android:textSize="16sp" />
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/txtLeaderboardPlaceholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Danh sách xếp hạng sẽ hiển thị ở đây."
+            android:textSize="15sp"
+            android:textColor="@color/text_secondary"
+            android:lineSpacingExtra="4dp" />
+    </ScrollView>
 
 </LinearLayout>
 

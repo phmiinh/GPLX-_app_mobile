@@ -3,6 +3,7 @@ package com.example.afinal;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -26,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class BookmarksActivity extends AppCompatActivity {
+    private static final String TAG = "BookmarksActivity";
     private ListView listView;
     private Button back;
     private SQLiteDatabase database = null;
@@ -49,49 +51,121 @@ public class BookmarksActivity extends AppCompatActivity {
             return;
         }
 
-        database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
-        analyticsRepository = new AnalyticsRepository(this);
-
-        listView = findViewById(R.id.lvQAR);
-        back = findViewById(R.id.btnQARback);
-
-        ArrayList<Question> questions = new ArrayList<>();
-        loadBookmarkedQuestions(questions);
-
-        QuestionAdapter adapter = new QuestionAdapter(this, R.layout.layout_listview_review, questions);
-        listView.setAdapter(adapter);
-
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        try {
+            analyticsRepository = new AnalyticsRepository(this);
+            // Ensure schema is initialized
+            analyticsRepository.ensureSchema();
+            
+            database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
+            if (database == null) {
+                Log.e(TAG, "Failed to open database");
+                Toast.makeText(this, "Không thể mở cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
                 finish();
+                return;
             }
-        });
+
+            listView = findViewById(R.id.lvQAR);
+            back = findViewById(R.id.btnQARback);
+
+            if (listView == null) {
+                Log.e(TAG, "ListView not found in layout");
+                Toast.makeText(this, "Lỗi giao diện", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            if (back == null) {
+                Log.e(TAG, "Back button not found in layout");
+                Toast.makeText(this, "Lỗi giao diện", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            ArrayList<Question> questions = new ArrayList<>();
+            loadBookmarkedQuestions(questions);
+
+            QuestionAdapter adapter = new QuestionAdapter(this, R.layout.layout_listview_review, questions);
+            listView.setAdapter(adapter);
+
+            back.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onCreate", e);
+            Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     private void loadBookmarkedQuestions(ArrayList<Question> out) {
-        String userId = UserIdentity.getUserId(this);
-        List<String> ids = analyticsRepository.getBookmarkedQuestionIds(userId);
-        for (String id : ids) {
-            Cursor cursor = database.query("questions", null, "question_id=?", new String[]{id}, null, null, null);
-            if (!cursor.moveToFirst()) {
-                cursor.close();
-                continue;
+        try {
+            String userId = UserIdentity.getUserId(this);
+            if (userId == null || userId.isEmpty()) {
+                Log.e(TAG, "User ID is null or empty");
+                return;
             }
-            Question q = new Question();
-            q.setId(cursor.getInt(0));
-            q.setContent(cursor.getString(2));
-            q.setImg_url(cursor.getString(3));
-            q.setExplain(cursor.getString(5));
-            q.setA(cursor.getString(6));
-            q.setB(cursor.getString(7));
-            q.setC(cursor.getString(8));
-            q.setD(cursor.getString(9));
-            q.setAnswer(cursor.getString(10));
-            q.setIs_critical(cursor.getInt(4));
-            q.setUserChoice("");
-            out.add(q);
-            cursor.close();
+
+            List<String> ids = analyticsRepository.getBookmarkedQuestionIds(userId);
+            if (ids == null || ids.isEmpty()) {
+                Log.d(TAG, "No bookmarked questions found for user: " + userId);
+                return;
+            }
+
+            if (database == null || !database.isOpen()) {
+                Log.e(TAG, "Database is null or closed");
+                database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
+                if (database == null) {
+                    Log.e(TAG, "Failed to reopen database");
+                    return;
+                }
+            }
+
+            for (String id : ids) {
+                if (id == null || id.isEmpty()) {
+                    continue;
+                }
+                try {
+                    Cursor cursor = database.query("questions", null, "question_id=?", new String[]{id}, null, null, null);
+                    if (cursor == null) {
+                        continue;
+                    }
+                    if (!cursor.moveToFirst()) {
+                        cursor.close();
+                        continue;
+                    }
+                    Question q = new Question();
+                    q.setId(cursor.getInt(0));
+                    q.setContent(cursor.getString(2));
+                    q.setImg_url(cursor.getString(3));
+                    q.setExplain(cursor.getString(5));
+                    q.setA(cursor.getString(6));
+                    q.setB(cursor.getString(7));
+                    q.setC(cursor.getString(8));
+                    q.setD(cursor.getString(9));
+                    q.setAnswer(cursor.getString(10));
+                    q.setIs_critical(cursor.getInt(4));
+                    q.setUserChoice("");
+                    out.add(q);
+                    cursor.close();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error loading question with id: " + id, e);
+                    // Continue with next question
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in loadBookmarkedQuestions", e);
+            Toast.makeText(this, "Lỗi khi tải danh sách câu hỏi đã đánh dấu: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (database != null && database.isOpen()) {
+            database.close();
         }
     }
 }

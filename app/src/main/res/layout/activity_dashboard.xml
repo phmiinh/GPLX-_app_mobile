@@ -62,7 +62,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Shortcut buttons -->
+    <!-- Shortcut cards row 1 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -72,31 +72,65 @@
 
         <Button
             android:id="@+id/btnDashboardPractice"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="Luyện tập" />
+            android:background="@drawable/bg_card_primary"
+            android:text="Luyện tập"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary" />
 
         <Button
             android:id="@+id/btnDashboardMockExam"
-            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_card_primary"
+            android:text="Thi thử"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary" />
+    </LinearLayout>
+
+    <!-- Shortcut cards row 2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnDashboardSmart"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="Thi thử" />
+            android:background="@drawable/bg_card_primary"
+            android:text="Ôn thông minh (AI)"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary" />
 
         <Button
-            android:id="@+id/btnDashboardSmart"
-            style="?android:attr/buttonStyleSmall"
+            android:id="@+id/btnDashboardLeaderboard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Ôn thông minh" />
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_card_primary"
+            android:text="Bảng xếp hạng"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary" />
     </LinearLayout>
 
+    <!-- Shortcut cards row 3 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -108,20 +142,27 @@
 
         <Button
             android:id="@+id/btnDashboardBookmarks"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="Câu hỏi đã đánh dấu" />
+            android:background="@drawable/bg_card_primary"
+            android:text="Câu hỏi đã đánh dấu"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary" />
 
         <Button
             android:id="@+id/btnDashboardHistory"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Lịch sử làm bài" />
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_card_primary"
+            android:text="Lịch sử làm bài"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary" />
     </LinearLayout>
 
     <!-- Placeholder card section; will be populated with real stats later -->
@@ -141,14 +182,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Thống kê sẽ hiển thị ở đây."
-                android:textSize="16sp"
+                android:textSize="15sp"
+                android:textColor="@color/text_secondary"
+                android:lineSpacingExtra="4dp"
                 android:paddingBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnDashboardLeaderboard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Xem bảng xếp hạng" />
 
         </LinearLayout>
     </ScrollView>
