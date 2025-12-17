@@ -74,6 +74,7 @@ dependencies {
 
     implementation("com.google.firebase:firebase-firestore")
 
-
+    // MPAndroidChart for dashboard charts
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
 }

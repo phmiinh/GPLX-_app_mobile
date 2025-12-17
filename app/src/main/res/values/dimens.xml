@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Padding and Margins -->
+    <!-- Nomadstay Design System - Radius Tokens -->
+    <dimen name="radius_screen">26dp</dimen>
+    <dimen name="radius_card_large">22dp</dimen>
+    <dimen name="radius_card_medium">18dp</dimen>
+    <dimen name="radius_card_small">18dp</dimen>
+    <dimen name="radius_button">20dp</dimen>
+    <dimen name="radius_chip">999dp</dimen>
+    <dimen name="radius_thumbnail">16dp</dimen>
+    <dimen name="radius_avatar">999dp</dimen>
+    
+    <!-- Legacy Corner Radius (mapped to new tokens) -->
+    <dimen name="corner_radius_small">12dp</dimen>
+    <dimen name="corner_radius_medium">18dp</dimen>
+    <dimen name="corner_radius_large">22dp</dimen>
+    <dimen name="corner_radius_xlarge">26dp</dimen>
+    
+    <!-- Nomadstay Design System - Elevation Tokens -->
+    <dimen name="elev_card">2dp</dimen>
+    <dimen name="elev_hero">4dp</dimen>
+    <dimen name="elev_fab">6dp</dimen>
+    <dimen name="elev_bottom_bar">8dp</dimen>
+    
+    <!-- Legacy Elevation (mapped to new tokens) -->
+    <dimen name="elevation_small">2dp</dimen>
+    <dimen name="elevation_medium">4dp</dimen>
+    <dimen name="elevation_large">8dp</dimen>
+    
+    <!-- Nomadstay Design System - Spacing Tokens -->
+    <dimen name="spacing_page_horizontal">20dp</dimen>
+    <dimen name="spacing_section_vertical">24dp</dimen>
+    <dimen name="spacing_item_vertical">16dp</dimen>
+    <dimen name="spacing_item_horizontal">12dp</dimen>
+    <dimen name="spacing_chip_horizontal">8dp</dimen>
+    <dimen name="spacing_small">4dp</dimen>
+    <dimen name="spacing_medium">8dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+    
+    <!-- Legacy Padding and Margins (kept for compatibility) -->
     <dimen name="padding_small">8dp</dimen>
     <dimen name="padding_medium">16dp</dimen>
     <dimen name="padding_large">24dp</dimen>
@@ -11,33 +48,28 @@
     <dimen name="margin_large">24dp</dimen>
     <dimen name="margin_xlarge">32dp</dimen>
     
-    <!-- Text Sizes -->
+    <!-- Nomadstay Design System - Size Tokens -->
+    <dimen name="size_fab">56dp</dimen>
+    <dimen name="height_bottom_bar">72dp</dimen>
+    <dimen name="height_chip">36dp</dimen>
+    <dimen name="size_icon_small">20dp</dimen>
+    <dimen name="size_icon_medium">24dp</dimen>
+    <dimen name="size_icon_large">32dp</dimen>
+    
+    <!-- Legacy Sizes (kept for compatibility) -->
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
     <dimen name="text_size_large">18sp</dimen>
     <dimen name="text_size_xlarge">24sp</dimen>
     <dimen name="text_size_xxlarge">28sp</dimen>
     
-    <!-- Button Sizes -->
     <dimen name="button_height">48dp</dimen>
     <dimen name="button_height_small">40dp</dimen>
     <dimen name="button_height_large">56dp</dimen>
     
-    <!-- Icon Sizes -->
     <dimen name="icon_size_small">24dp</dimen>
     <dimen name="icon_size_medium">32dp</dimen>
     <dimen name="icon_size_large">48dp</dimen>
-    
-    <!-- Corner Radius -->
-    <dimen name="corner_radius_small">8dp</dimen>
-    <dimen name="corner_radius_medium">12dp</dimen>
-    <dimen name="corner_radius_large">16dp</dimen>
-    <dimen name="corner_radius_xlarge">20dp</dimen>
-    
-    <!-- Elevation -->
-    <dimen name="elevation_small">2dp</dimen>
-    <dimen name="elevation_medium">4dp</dimen>
-    <dimen name="elevation_large">8dp</dimen>
 </resources>
 
 

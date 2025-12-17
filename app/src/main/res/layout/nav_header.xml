@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_page_horizontal"
+    android:background="@color/color_surface"
+    android:paddingTop="@dimen/spacing_section_vertical"
+    android:paddingBottom="@dimen/spacing_large">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/spacing_medium"
+        app:cardCornerRadius="@dimen/radius_avatar"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/color_primary">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_user"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/nav_dashboard" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/nav_header_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="User Name"
+        android:textColor="@color/color_text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/spacing_small" />
+
+    <TextView
+        android:id="@+id/nav_header_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Tiến độ hôm nay: 65%"
+        android:textColor="@color/color_text_secondary"
+        android:textSize="14sp" />
+</LinearLayout>
+

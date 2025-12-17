@@ -31,4 +31,22 @@
     <string name="cancel">Hủy</string>
     <string name="back">Quay lại</string>
     <string name="continue_text">Tiếp tục</string>
+    
+    <!-- Navigation Drawer -->
+    <string name="navigation_drawer_open">Mở menu</string>
+    <string name="navigation_drawer_close">Đóng menu</string>
+    <string name="nav_dashboard">Trang chủ</string>
+    <string name="nav_topic">Ôn theo chủ đề</string>
+    <string name="nav_level">Thi thử</string>
+    <string name="nav_bookmarks">Câu hỏi đã đánh dấu</string>
+    <string name="nav_history">Lịch sử làm bài</string>
+    <string name="nav_leaderboard">Bảng xếp hạng</string>
+    <string name="nav_settings">Cài đặt</string>
+    
+    <!-- Bottom Navigation -->
+    <string name="bottom_nav_home">Trang chủ</string>
+    <string name="bottom_nav_practice">Luyện tập</string>
+    <string name="bottom_nav_mock">Thi thử</string>
+    <string name="bottom_nav_more">Thêm</string>
+    <string name="fab_quick_exam">Thi nhanh</string>
 </resources>

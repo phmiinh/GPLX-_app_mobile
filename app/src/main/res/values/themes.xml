@@ -1,27 +1,27 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme - Nomadstay Design System -->
     <style name="Base.Theme.Final" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Primary colors -->
-        <item name="colorPrimary">@color/primary_dark</item>
-        <item name="colorPrimaryVariant">@color/secondary_blue</item>
-        <item name="colorOnPrimary">@color/text_on_dark</item>
+        <!-- Primary colors - Orange accent -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryVariant">@color/color_primary_variant</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
         
         <!-- Secondary colors -->
-        <item name="colorSecondary">@color/accent_teal</item>
-        <item name="colorSecondaryVariant">@color/light_gray</item>
-        <item name="colorOnSecondary">@color/text_on_dark</item>
+        <item name="colorSecondary">@color/color_primary_variant</item>
+        <item name="colorSecondaryVariant">@color/color_surface_soft</item>
+        <item name="colorOnSecondary">@color/color_on_primary</item>
         
-        <!-- Background colors -->
-        <item name="android:colorBackground">@color/background_primary</item>
-        <item name="colorSurface">@color/card_background</item>
-        <item name="colorOnSurface">@color/text_primary</item>
+        <!-- Background colors - Light grey background -->
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="colorOnSurface">@color/color_text_primary</item>
         
         <!-- Text colors -->
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorPrimary">@color/color_text_primary</item>
+        <item name="android:textColorSecondary">@color/color_text_secondary</item>
         
         <!-- Status bar -->
-        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:statusBarColor">@color/color_hero_bg</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- Default Material button styles -->
@@ -32,65 +32,168 @@
 
     <style name="Theme.Final" parent="Base.Theme.Final" />
     
-    <!-- Custom Button Styles -->
+    <!-- Nomadstay Button Styles -->
     <style name="ButtonPrimary" parent="Widget.Material3.Button">
-        <item name="android:background">@drawable/btn_primary</item>
-        <item name="android:textColor">@color/button_text</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/btn_primary_gradient</item>
+        <item name="android:textColor">@color/color_on_primary</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
         <item name="android:paddingStart">@dimen/padding_medium</item>
         <item name="android:paddingEnd">@dimen/padding_medium</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:minHeight">@dimen/button_height</item>
     </style>
     
     <style name="ButtonSecondary" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:background">@drawable/btn_secondary</item>
-        <item name="android:textColor">@color/button_text_secondary</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/color_on_primary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
         <item name="android:paddingStart">@dimen/padding_medium</item>
         <item name="android:paddingEnd">@dimen/padding_medium</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
     </style>
 
     <style name="ButtonOutline" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:background">@drawable/btn_outline</item>
-        <item name="android:textColor">@color/button_outline_stroke</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+        <item name="strokeColor">@color/color_outline</item>
         <item name="android:paddingStart">@dimen/padding_medium</item>
         <item name="android:paddingEnd">@dimen/padding_medium</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
     </style>
     
-    <!-- Card Style -->
+    <style name="ButtonGhost" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:paddingStart">@dimen/padding_medium</item>
+        <item name="android:paddingEnd">@dimen/padding_medium</item>
+    </style>
+    
+    <!-- Nomadstay Card Styles -->
+    <style name="Widget.App.Card.Large" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/radius_card_large</item>
+        <item name="cardElevation">@dimen/elev_card</item>
+        <item name="cardBackgroundColor">@color/color_surface</item>
+        <item name="android:layout_margin">@dimen/spacing_medium</item>
+    </style>
+    
+    <style name="Widget.App.Card.Medium" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/radius_card_medium</item>
+        <item name="cardElevation">@dimen/elev_card</item>
+        <item name="cardBackgroundColor">@color/color_surface</item>
+        <item name="android:layout_margin">@dimen/spacing_medium</item>
+    </style>
+    
+    <style name="Widget.App.Card.Small" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/radius_card_small</item>
+        <item name="cardElevation">@dimen/elev_card</item>
+        <item name="cardBackgroundColor">@color/color_surface</item>
+        <item name="android:layout_margin">@dimen/spacing_small</item>
+    </style>
+    
+    <!-- Legacy Card Style (kept for compatibility) -->
     <style name="CardStyle">
         <item name="android:background">@drawable/card_background</item>
-        <item name="android:layout_margin">8dp</item>
-        <item name="android:elevation">4dp</item>
+        <item name="android:layout_margin">@dimen/spacing_medium</item>
+        <item name="android:elevation">@dimen/elev_card</item>
     </style>
     
-    <!-- Text Styles -->
+    <!-- Nomadstay Chip Styles -->
+    <style name="Widget.App.Chip.Filled" parent="Widget.Material3.Chip.Assist">
+        <item name="chipBackgroundColor">@color/color_primary</item>
+        <item name="chipCornerRadius">@dimen/radius_chip</item>
+        <item name="android:textColor">@color/color_on_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="chipMinHeight">@dimen/height_chip</item>
+    </style>
+    
+    <style name="Widget.App.Chip.Outlined" parent="Widget.Material3.Chip.Assist">
+        <item name="chipBackgroundColor">@color/color_surface_soft</item>
+        <item name="chipCornerRadius">@dimen/radius_chip</item>
+        <item name="android:textColor">@color/color_text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="chipMinHeight">@dimen/height_chip</item>
+        <item name="chipStrokeColor">@color/color_outline</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+    
+    <style name="Widget.App.Chip.Suggestion" parent="Widget.Material3.Chip.Suggestion">
+        <item name="chipCornerRadius">@dimen/radius_chip</item>
+        <item name="android:textSize">14sp</item>
+        <item name="chipMinHeight">@dimen/height_chip</item>
+    </style>
+    
+    <!-- Nomadstay Typography Styles -->
+    <style name="TextDashboardTitle">
+        <item name="android:textColor">@color/color_text_primary</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    
+    <style name="TextSectionTitle">
+        <item name="android:textColor">@color/color_text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="TextBody">
+        <item name="android:textColor">@color/color_text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+    
+    <style name="TextCaption">
+        <item name="android:textColor">@color/color_text_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    
+    <style name="TextBadge">
+        <item name="android:textColor">@color/color_on_primary</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+    
+    <!-- Legacy Text Styles (kept for compatibility) -->
     <style name="TextHeading">
-        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColor">@color/color_text_primary</item>
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>
     </style>
     
     <style name="TextSubheading">
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/color_text_secondary</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
     
-    <style name="TextBody">
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">16sp</item>
+    <!-- Bottom App Bar Style -->
+    <style name="Widget.App.BottomAppBar" parent="Widget.Material3.BottomAppBar">
+        <item name="backgroundTint">@color/color_surface</item>
     </style>
     
-    <style name="TextCaption">
-        <item name="android:textColor">@color/text_light</item>
-        <item name="android:textSize">14sp</item>
+    <!-- FAB Orange Style -->
+    <style name="Widget.App.Fab.Orange" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="backgroundTint">@color/color_primary</item>
+        <item name="tint">@color/color_on_primary</item>
+        <item name="android:elevation">@dimen/elev_fab</item>
+        <item name="fabSize">normal</item>
+    </style>
+    
+    <!-- Text Input Layout Search Style -->
+    <style name="Widget.App.TextInputLayout.Search" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundMode">none</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="android:background">@drawable/bg_search_field</item>
+        <item name="hintTextColor">@color/color_text_muted</item>
+        <item name="android:textColorHint">@color/color_text_muted</item>
     </style>
 </resources>

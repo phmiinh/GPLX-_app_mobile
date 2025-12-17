@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bottom_nav_home"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/bottom_nav_home"
+        android:checkable="true" />
+    <item
+        android:id="@+id/bottom_nav_practice"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="@string/bottom_nav_practice"
+        android:checkable="true" />
+    <item
+        android:id="@+id/bottom_nav_mock"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="@string/bottom_nav_mock"
+        android:checkable="true" />
+    <item
+        android:id="@+id/bottom_nav_more"
+        android:icon="@android:drawable/ic_menu_more"
+        android:title="@string/bottom_nav_more"
+        android:checkable="true" />
+</menu>
+
