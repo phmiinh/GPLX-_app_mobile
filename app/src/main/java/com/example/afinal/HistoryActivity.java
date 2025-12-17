@@ -96,23 +96,80 @@ public class HistoryActivity extends AppCompatActivity {
             if (numCriticalWrong == null) {
                 numCriticalWrong = doc.getLong("num_liet_wrong");
             }
+            Long minRequiredLong = doc.getLong("min_required");
+            Long totalQuestionsLong = doc.getLong("total_questions");
+            Long durationMsLong = doc.getLong("duration_ms");
 
             int score = scoreRaw != null ? scoreRaw.intValue() : 0;
             int criticalWrong = numCriticalWrong != null ? numCriticalWrong.intValue() : 0;
-            String status = criticalWrong > 0 ? "Trượt" : "Đỗ";
+            int minRequired = minRequiredLong != null ? minRequiredLong.intValue() : -1;
+            int totalQuestions = totalQuestionsLong != null ? totalQuestionsLong.intValue() : 0;
+
+            // Tên bài thi / hạng
+            String levelName = doc.getString("level_name");
+            Long levelId = doc.getLong("level_id");
+            String examLabel;
+            if (levelName != null && !levelName.isEmpty()) {
+                examLabel = "Hạng " + levelName;
+            } else if (levelId != null) {
+                examLabel = "Hạng " + levelId;
+            } else {
+                examLabel = "Bài thi";
+            }
+
+            // Trạng thái: nếu có min_required thì áp dụng đúng rule đỗ/trượt như màn chọn hạng
+            String status;
+            if (minRequired > 0) {
+                if (criticalWrong > 0 || score < minRequired) {
+                    status = "Trượt";
+                } else {
+                    status = "Đỗ";
+                }
+            } else {
+                // Backward compatibility: giữ rule cũ nếu chưa có min_required
+                status = criticalWrong > 0 ? "Trượt" : "Đỗ";
+            }
 
             long submittedVal = (submittedAt != null ? submittedAt : 0L);
             String timeStr = submittedVal > 0
                     ? fmt.format(new Date(submittedVal))
                     : "(không rõ thời gian)";
 
-            String row = timeStr + " • Điểm: " + score + " • Trạng thái: " + status;
-            if (criticalWrong > 0) {
-                row += " • Sai " + criticalWrong + " câu điểm liệt";
+            // Thời gian làm bài thực tế (từ duration_ms)
+            int timeMinutes = 0;
+            int timeSeconds = 0;
+            if (durationMsLong != null && durationMsLong > 0) {
+                long totalSec = durationMsLong / 1000;
+                timeMinutes = (int) (totalSec / 60);
+                timeSeconds = (int) (totalSec % 60);
             }
+
+            StringBuilder rowBuilder = new StringBuilder();
+            rowBuilder.append(timeStr);
+            rowBuilder.append(" • ").append(examLabel);
+            if (totalQuestions > 0) {
+                rowBuilder.append(" • Điểm: ").append(score).append("/").append(totalQuestions);
+            } else {
+                rowBuilder.append(" • Điểm: ").append(score);
+            }
+            rowBuilder.append(" • Trạng thái: ").append(status);
+            if (timeMinutes > 0 || timeSeconds > 0) {
+                rowBuilder.append(" • Thời gian: ");
+                if (timeMinutes > 0) {
+                    rowBuilder.append(timeMinutes).append(" phút");
+                    if (timeSeconds > 0) rowBuilder.append(" ");
+                }
+                if (timeSeconds > 0) {
+                    rowBuilder.append(timeSeconds).append(" giây");
+                }
+            }
+            if (criticalWrong > 0) {
+                rowBuilder.append(" • Sai ").append(criticalWrong).append(" câu điểm liệt");
+            }
+
             HistoryItem item = new HistoryItem();
             item.submittedAt = submittedVal;
-            item.text = row;
+            item.text = rowBuilder.toString();
             items.add(item);
         }
 

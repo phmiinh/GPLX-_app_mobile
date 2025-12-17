@@ -72,6 +72,13 @@ public class DashboardActivity extends AppCompatActivity {
         loadStatsIfLoggedIn();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Mỗi lần quay lại Dashboard, tải lại thống kê để luôn “realtime”
+        loadStatsIfLoggedIn();
+    }
+
     private void bindViews() {
         greetingTitle = findViewById(R.id.txtDashboardTitle);
         greetingSubtitle = findViewById(R.id.txtDashboardSubtitle);

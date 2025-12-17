@@ -438,14 +438,15 @@ public class QuestionActivityBase extends AppCompatActivity {
         // Save exam session to Firebase
         Map<String, Object> session = new HashMap<>();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        // Use Firebase UID if available so history/dashboard can filter đúng theo tài khoản đăng nhập
+        // Use Firebase UID if available so history/dashboard có thể lọc đúng theo tài khoản đăng nhập
         String userId = (firebaseUser != null ? firebaseUser.getUid() : UserIdentity.getUserId(this));
         long now = System.currentTimeMillis();
         session.put("session_id", sessionId);
         session.put("user_id", userId);
         session.put("started_at_ms", sessionStartAt);  // Renamed from started_at
         session.put("submitted_at_ms", now);  // Renamed from submitted_at
-        session.put("duration_ms", now - sessionStartAt);
+        long durationMs = now - sessionStartAt;
+        session.put("duration_ms", durationMs);
         // blueprint_json as Map (preferred) or legacy string format
         if (id.equals("level") && rule != null && !rule.isEmpty()) {
             // Normal mock exam using blueprint rule
@@ -468,6 +469,18 @@ public class QuestionActivityBase extends AppCompatActivity {
         session.put("num_correct", truecnt);
         session.put("num_incorrect", Math.max(0, count - truecnt));
         session.put("num_critical_wrong", numCriticalWrong);
+        // Bổ sung metadata cho bài thi theo hạng (level) để History/Leaderboard hiển thị chuẩn
+        if ("level".equals(id)) {
+            session.put("level_id", level);
+            // "name" được truyền từ QuestionActivityLobby
+            String levelName = intent.getStringExtra("name");
+            if (levelName != null) {
+                session.put("level_name", levelName);
+            }
+            session.put("min_required", min);
+            session.put("total_questions", count);
+            // Không lưu tổng thời gian cho phép; History sẽ dùng duration_ms để tính thời gian thực tế
+        }
         analyticsRepository.upsertExamSession(session);
         firestoreService.saveExamSession(session);
         
