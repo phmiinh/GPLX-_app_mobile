@@ -67,10 +67,10 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void loadHistory(String uid) {
+        // Để tránh lỗi index Firestore (where + orderBy), ta chỉ where theo user_id
+        // rồi sort theo submitted_at_ms ở phía client.
         db.collection("exam_sessions")
                 .whereEqualTo("user_id", uid)
-                .orderBy("submitted_at_ms", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                .limit(100)
                 .get()
                 .addOnSuccessListener(this::bindHistory)
                 .addOnFailureListener(e -> {
@@ -79,7 +79,7 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void bindHistory(QuerySnapshot snap) {
-        List<String> rows = new ArrayList<>();
+        List<HistoryItem> items = new ArrayList<>();
         SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
 
         for (QueryDocumentSnapshot doc : snap) {
@@ -101,15 +101,30 @@ public class HistoryActivity extends AppCompatActivity {
             int criticalWrong = numCriticalWrong != null ? numCriticalWrong.intValue() : 0;
             String status = criticalWrong > 0 ? "Trượt" : "Đỗ";
 
-            String timeStr = submittedAt != null && submittedAt > 0
-                    ? fmt.format(new Date(submittedAt))
+            long submittedVal = (submittedAt != null ? submittedAt : 0L);
+            String timeStr = submittedVal > 0
+                    ? fmt.format(new Date(submittedVal))
                     : "(không rõ thời gian)";
 
             String row = timeStr + " • Điểm: " + score + " • Trạng thái: " + status;
             if (criticalWrong > 0) {
                 row += " • Sai " + criticalWrong + " câu điểm liệt";
             }
-            rows.add(row);
+            HistoryItem item = new HistoryItem();
+            item.submittedAt = submittedVal;
+            item.text = row;
+            items.add(item);
+        }
+
+        // Sort mới nhất lên đầu và giới hạn ~100 bản ghi cho gọn
+        java.util.Collections.sort(items, (a, b) -> Long.compare(b.submittedAt, a.submittedAt));
+        if (items.size() > 100) {
+            items = items.subList(0, 100);
+        }
+
+        List<String> rows = new ArrayList<>();
+        for (HistoryItem it : items) {
+            rows.add(it.text);
         }
 
         if (rows.isEmpty()) {
@@ -122,6 +137,11 @@ public class HistoryActivity extends AppCompatActivity {
                 rows
         );
         listView.setAdapter(adapter);
+    }
+
+    private static class HistoryItem {
+        long submittedAt;
+        String text;
     }
 }
 

@@ -21,10 +21,17 @@ import com.example.afinal.analytics.UserIdentity;
 import com.example.afinal.dbclass.Question;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class BookmarksActivity extends AppCompatActivity {
     private static final String TAG = "BookmarksActivity";
@@ -32,6 +39,8 @@ public class BookmarksActivity extends AppCompatActivity {
     private Button back;
     private SQLiteDatabase database = null;
     private AnalyticsRepository analyticsRepository;
+    private QuestionAdapter adapter;
+    private ArrayList<Question> questions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +64,7 @@ public class BookmarksActivity extends AppCompatActivity {
             analyticsRepository = new AnalyticsRepository(this);
             // Ensure schema is initialized
             analyticsRepository.ensureSchema();
-            
+
             database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
             if (database == null) {
                 Log.e(TAG, "Failed to open database");
@@ -66,25 +75,21 @@ public class BookmarksActivity extends AppCompatActivity {
 
             listView = findViewById(R.id.lvQAR);
             back = findViewById(R.id.btnQARback);
+            // Tuỳ chỉnh lại header cho màn bookmarks
+            android.widget.TextView info = findViewById(R.id.txtQARinfo);
+            if (info != null) {
+                info.setText("Câu hỏi đã đánh dấu");
+            }
 
-            if (listView == null) {
-                Log.e(TAG, "ListView not found in layout");
+            if (listView == null || back == null) {
+                Log.e(TAG, "ListView or back button not found in layout");
                 Toast.makeText(this, "Lỗi giao diện", Toast.LENGTH_SHORT).show();
                 finish();
                 return;
             }
 
-            if (back == null) {
-                Log.e(TAG, "Back button not found in layout");
-                Toast.makeText(this, "Lỗi giao diện", Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            }
-
-            ArrayList<Question> questions = new ArrayList<>();
-            loadBookmarkedQuestions(questions);
-
-            QuestionAdapter adapter = new QuestionAdapter(this, R.layout.layout_listview_review, questions);
+            questions = new ArrayList<>();
+            adapter = new QuestionAdapter(this, R.layout.layout_listview_review, questions);
             listView.setAdapter(adapter);
 
             back.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +98,11 @@ public class BookmarksActivity extends AppCompatActivity {
                     finish();
                 }
             });
+
+            // Load bookmarks from Firestore trước; fallback SQLite nếu cần
+            String userId = firebaseUser.getUid();
+            loadBookmarksFromFirestore(userId);
+
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreate", e);
             Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -100,64 +110,112 @@ public class BookmarksActivity extends AppCompatActivity {
         }
     }
 
-    private void loadBookmarkedQuestions(ArrayList<Question> out) {
-        try {
-            String userId = UserIdentity.getUserId(this);
-            if (userId == null || userId.isEmpty()) {
-                Log.e(TAG, "User ID is null or empty");
-                return;
-            }
+    /**
+     * Load bookmarks from Firestore `bookmarks` collection for current user.
+     * For each `question_id`, we join with local SQLite `questions` table to build full Question objects.
+     * If Firestore query fails, we fall back to local bookmarks table.
+     */
+    private void loadBookmarksFromFirestore(final String userId) {
+        if (userId == null || userId.isEmpty()) {
+            Log.e(TAG, "User ID is null or empty");
+            return;
+        }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("bookmarks")
+                .whereEqualTo("user_id", userId)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        try {
+                            Set<String> idSet = new HashSet<>();
+                            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                                String qid = doc.getString("question_id");
+                                if (qid != null && !qid.isEmpty()) {
+                                    idSet.add(qid);
+                                }
+                            }
+                            if (idSet.isEmpty()) {
+                                Log.d(TAG, "No Firestore bookmarks, falling back to local");
+                                loadBookmarkedQuestionsLocal(userId);
+                                return;
+                            }
+                            loadQuestionsByIds(new ArrayList<>(idSet));
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error processing Firestore bookmarks", e);
+                            loadBookmarkedQuestionsLocal(userId);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e(TAG, "Failed to load bookmarks from Firestore", e);
+                        loadBookmarkedQuestionsLocal(userId);
+                    }
+                });
+    }
 
+    /**
+     * Fallback: load bookmarked question IDs from local SQLite bookmarks table via AnalyticsRepository.
+     */
+    private void loadBookmarkedQuestionsLocal(String userId) {
+        try {
             List<String> ids = analyticsRepository.getBookmarkedQuestionIds(userId);
             if (ids == null || ids.isEmpty()) {
-                Log.d(TAG, "No bookmarked questions found for user: " + userId);
+                Log.d(TAG, "No local bookmarks found for user: " + userId);
+                Toast.makeText(this, "Chưa có câu hỏi nào được đánh dấu", Toast.LENGTH_SHORT).show();
                 return;
             }
+            loadQuestionsByIds(ids);
+        } catch (Exception e) {
+            Log.e(TAG, "Error in loadBookmarkedQuestionsLocal", e);
+            Toast.makeText(this, "Lỗi khi tải danh sách câu hỏi đã đánh dấu", Toast.LENGTH_LONG).show();
+        }
+    }
 
-            if (database == null || !database.isOpen()) {
-                Log.e(TAG, "Database is null or closed");
-                database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
-                if (database == null) {
-                    Log.e(TAG, "Failed to reopen database");
-                    return;
-                }
-            }
-
-            for (String id : ids) {
-                if (id == null || id.isEmpty()) {
+    /**
+     * Given a list of question IDs (as string), query local `questions` table and build Question objects.
+     */
+    private void loadQuestionsByIds(List<String> ids) {
+        if (database == null || !database.isOpen()) {
+            database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
+        }
+        if (database == null) {
+            Log.e(TAG, "Database is null when loading questions");
+            return;
+        }
+        questions.clear();
+        for (String id : ids) {
+            if (id == null || id.isEmpty()) continue;
+            Cursor cursor = null;
+            try {
+                cursor = database.query("questions", null, "question_id=?", new String[]{id}, null, null, null);
+                if (cursor == null || !cursor.moveToFirst()) {
                     continue;
                 }
-                try {
-                    Cursor cursor = database.query("questions", null, "question_id=?", new String[]{id}, null, null, null);
-                    if (cursor == null) {
-                        continue;
-                    }
-                    if (!cursor.moveToFirst()) {
-                        cursor.close();
-                        continue;
-                    }
-                    Question q = new Question();
-                    q.setId(cursor.getInt(0));
-                    q.setContent(cursor.getString(2));
-                    q.setImg_url(cursor.getString(3));
-                    q.setExplain(cursor.getString(5));
-                    q.setA(cursor.getString(6));
-                    q.setB(cursor.getString(7));
-                    q.setC(cursor.getString(8));
-                    q.setD(cursor.getString(9));
-                    q.setAnswer(cursor.getString(10));
-                    q.setIs_critical(cursor.getInt(4));
-                    q.setUserChoice("");
-                    out.add(q);
-                    cursor.close();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error loading question with id: " + id, e);
-                    // Continue with next question
-                }
+                Question q = new Question();
+                q.setId(cursor.getInt(0));
+                q.setContent(cursor.getString(2));
+                q.setImg_url(cursor.getString(3));
+                q.setExplain(cursor.getString(5));
+                q.setA(cursor.getString(6));
+                q.setB(cursor.getString(7));
+                q.setC(cursor.getString(8));
+                q.setD(cursor.getString(9));
+                q.setAnswer(cursor.getString(10));
+                q.setIs_critical(cursor.getInt(4));
+                q.setUserChoice("");
+                questions.add(q);
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading question with id: " + id, e);
+            } finally {
+                if (cursor != null) cursor.close();
             }
-        } catch (Exception e) {
-            Log.e(TAG, "Error in loadBookmarkedQuestions", e);
-            Toast.makeText(this, "Lỗi khi tải danh sách câu hỏi đã đánh dấu: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        adapter.notifyDataSetChanged();
+        if (questions.isEmpty()) {
+            Toast.makeText(this, "Không tìm thấy nội dung cho các câu hỏi đã đánh dấu", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -169,6 +227,3 @@ public class BookmarksActivity extends AppCompatActivity {
         }
     }
 }
-
-
-

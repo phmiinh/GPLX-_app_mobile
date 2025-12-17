@@ -264,7 +264,9 @@ public class QuestionActivityBase extends AppCompatActivity {
         } catch (Exception ignored) {}
 
         Map<String, Object> record = new HashMap<>();
-        record.put("user_id", UserIdentity.getUserId(this));
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        String userIdForLogs = (firebaseUser != null ? firebaseUser.getUid() : UserIdentity.getUserId(this));
+        record.put("user_id", userIdForLogs);
         record.put("question_id", String.valueOf(ques_id));  // Changed to string
         record.put("topic_id", topicId);
         record.put("is_correct", correct);
@@ -336,7 +338,8 @@ public class QuestionActivityBase extends AppCompatActivity {
             Toast.makeText(this, "Vui lòng đăng nhập để sử dụng tính năng đánh dấu câu hỏi", Toast.LENGTH_SHORT).show();
             return;
         }
-        String userId = UserIdentity.getUserId(this);
+        // Use Firebase UID for consistency with Firestore rules and BookmarksActivity
+        String userId = firebaseUser.getUid();
         long now = System.currentTimeMillis();
         
         Map<String, Object> bookmark = new HashMap<>();
@@ -434,7 +437,9 @@ public class QuestionActivityBase extends AppCompatActivity {
         
         // Save exam session to Firebase
         Map<String, Object> session = new HashMap<>();
-        String userId = UserIdentity.getUserId(this);
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        // Use Firebase UID if available so history/dashboard can filter đúng theo tài khoản đăng nhập
+        String userId = (firebaseUser != null ? firebaseUser.getUid() : UserIdentity.getUserId(this));
         long now = System.currentTimeMillis();
         session.put("session_id", sessionId);
         session.put("user_id", userId);

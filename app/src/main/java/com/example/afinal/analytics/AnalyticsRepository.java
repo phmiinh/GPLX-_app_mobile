@@ -3,6 +3,7 @@ package com.example.afinal.analytics;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 
 import org.json.JSONObject;
 
@@ -190,8 +191,17 @@ public class AnalyticsRepository {
         java.util.ArrayList<String> ids = new java.util.ArrayList<>();
         android.database.Cursor c = null;
         try {
-            c = db.rawQuery("SELECT question_id FROM bookmarks WHERE user_id=? ORDER BY created_at_ms DESC",
-                    new String[]{userId});
+            try {
+                // Newer schema: has created_at_ms column for ordering
+                c = db.rawQuery(
+                        "SELECT question_id FROM bookmarks WHERE user_id=? ORDER BY created_at_ms DESC",
+                        new String[]{userId});
+            } catch (SQLiteException e) {
+                // Backward-compatible fallback: old DB without created_at_ms
+                c = db.rawQuery(
+                        "SELECT question_id FROM bookmarks WHERE user_id=?",
+                        new String[]{userId});
+            }
             while (c.moveToNext()) {
                 ids.add(c.getString(0));
             }
