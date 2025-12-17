@@ -1,5 +1,6 @@
 package com.example.afinal;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -72,8 +73,16 @@ public class BookmarksActivity extends BaseNavigationActivity {
             adapter = new BookmarkAdapter(this, questions, new BookmarkAdapter.OnBookmarkClickListener() {
                 @Override
                 public void onBookmarkClick(Question question, int position) {
-                    // TODO: Navigate to question detail or review
-                    Toast.makeText(BookmarksActivity.this, "Câu " + (position + 1), Toast.LENGTH_SHORT).show();
+                    if (question == null) {
+                        Log.e(TAG, "Question is null when clicking bookmark");
+                        Toast.makeText(BookmarksActivity.this, "Lỗi: Không tìm thấy câu hỏi", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    // Navigate to question detail
+                    Log.d(TAG, "Navigating to QuestionDetailActivity with question: " + question.getContent());
+                    Intent intent = new Intent(BookmarksActivity.this, QuestionDetailActivity.class);
+                    intent.putExtra("question", question);
+                    startActivity(intent);
                 }
             });
             rvBookmarks.setAdapter(adapter);

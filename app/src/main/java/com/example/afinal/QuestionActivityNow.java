@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -37,6 +38,10 @@ public class QuestionActivityNow extends QuestionActivityBase {
     private Button next;
     private TextView explain;
     private Button btnAIExplain;
+    private TextView txtAIExplain;
+    private ProgressBar progressAI;
+    private View explanationSection;
+    private View aiExplanationSection;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +92,14 @@ public class QuestionActivityNow extends QuestionActivityBase {
         bookmarkButton=findViewById(R.id.iv_bookmark_button);
         timer=findViewById(R.id.txtQANtimer);
         setupBookmarkButton();
+        
+        // New views for redesigned layout
+        explanationSection = findViewById(R.id.explanation_section);
+        aiExplanationSection = findViewById(R.id.ai_explanation_section);
+        txtAIExplain = findViewById(R.id.txtAIExplain);
+        progressAI = findViewById(R.id.progressAI);
         btnAIExplain=findViewById(R.id.btnAIExplain);
+        
         if (btnAIExplain != null) {
             btnAIExplain.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -110,12 +122,24 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     return;
                 }
                 if(next.getText().toString().equals("Kiểm tra")){
-                    explain.setText("Giải thích: " + listQuestion.get(anInt).getExplain());
-                    if (btnAIExplain != null) {
-                        btnAIExplain.setVisibility(View.VISIBLE);
-                        btnAIExplain.setEnabled(true);
-                        btnAIExplain.setText("AI giải thích");
+                    // Show standard explanation
+                    explain.setText(listQuestion.get(anInt).getExplain());
+                    if (explanationSection != null) {
+                        explanationSection.setVisibility(View.VISIBLE);
                     }
+                    
+                    // Show AI explanation section
+                    if (aiExplanationSection != null) {
+                        aiExplanationSection.setVisibility(View.VISIBLE);
+                    }
+                    if (btnAIExplain != null) {
+                        btnAIExplain.setEnabled(true);
+                        btnAIExplain.setText("Tạo giải thích");
+                    }
+                    if (txtAIExplain != null) {
+                        txtAIExplain.setText("Nhấn nút \"Tạo giải thích\" bên dưới để AI phân tích chi tiết câu hỏi này.");
+                    }
+                    
                     next.setText("Câu tiếp theo");
                     // Highlight correct (green) and incorrect (red) answers
                     AnswerColorHelper.showAnswerWithColors(a,b,c,d, radioGroup, listQuestion.get(anInt).getAnswer());
@@ -129,10 +153,14 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     explain.setText("");
                     next.setText("Kiểm tra");
                     set_content(listQuestion.get(anInt),context);
-                    if (btnAIExplain != null) {
-                        btnAIExplain.setVisibility(View.GONE);
+                    
+                    // Hide explanation sections for next question
+                    if (explanationSection != null) {
+                        explanationSection.setVisibility(View.GONE);
                     }
-
+                    if (aiExplanationSection != null) {
+                        aiExplanationSection.setVisibility(View.GONE);
+                    }
                 }
             }
         });
@@ -145,20 +173,28 @@ public class QuestionActivityNow extends QuestionActivityBase {
         question.setUserChoice(null);
         listQuestion.get(anInt).setUserChoice(null);
         AnswerColorHelper.resetAnswerColors(a,b,c,d);
-        if (btnAIExplain != null) {
-            btnAIExplain.setVisibility(View.GONE);
+        
+        // Hide all explanation sections for new question
+        if (explanationSection != null) {
+            explanationSection.setVisibility(View.GONE);
+        }
+        if (aiExplanationSection != null) {
+            aiExplanationSection.setVisibility(View.GONE);
         }
     }
 
     private void requestAiExplanationForCurrent() {
         if (btnAIExplain == null) return;
-        // Yêu cầu người dùng chọn đáp án trước khi gọi AI
-        if (radioGroup.getCheckedRadioButtonId() == -1) {
-            Toast.makeText(this, "Vui lòng chọn đáp án trước khi yêu cầu AI giải thích.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        
+        // Disable button and show progress
         btnAIExplain.setEnabled(false);
-        btnAIExplain.setText("Đang gọi AI giải thích...");
+        btnAIExplain.setVisibility(View.GONE);
+        if (progressAI != null) {
+            progressAI.setVisibility(View.VISIBLE);
+        }
+        if (txtAIExplain != null) {
+            txtAIExplain.setText("Đang tạo giải thích...");
+        }
 
         final String questionText = content.getText().toString();
         final String optionA = a.getText().toString();
@@ -166,6 +202,25 @@ public class QuestionActivityNow extends QuestionActivityBase {
         final String optionC = c.getVisibility() == View.VISIBLE ? c.getText().toString() : null;
         final String optionD = d.getVisibility() == View.VISIBLE ? d.getText().toString() : null;
         final boolean hasImg = img_url != null && !img_url.isEmpty();
+        
+        // Get GEMINI_API_KEY from BuildConfig
+        String apiKey = BuildConfig.GEMINI_API_KEY;
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (progressAI != null) progressAI.setVisibility(View.GONE);
+                    if (btnAIExplain != null) {
+                        btnAIExplain.setVisibility(View.VISIBLE);
+                        btnAIExplain.setEnabled(true);
+                    }
+                    if (txtAIExplain != null) {
+                        txtAIExplain.setText("API key chưa được cấu hình. Vui lòng thêm GEMINI_API_KEY vào local.properties.");
+                    }
+                }
+            });
+            return;
+        }
 
         new Thread(new Runnable() {
             @Override
@@ -201,26 +256,51 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            if (progressAI != null) progressAI.setVisibility(View.GONE);
+                            
                             if (!result.isEmpty()) {
-                                String prev = explain.getText() == null ? "" : explain.getText().toString();
-                                String merged = prev.isEmpty() ? ("AI giải thích:\n" + result) : (prev + "\n\nAI giải thích:\n" + result);
-                                explain.setText(merged);
-                                // Mark that AI was used for this question so analytics can capture it
+                                if (txtAIExplain != null) {
+                                    txtAIExplain.setText(result);
+                                }
+                                // Mark that AI was used for this question
                                 aiUsedForCurrentQuestion = true;
+                                
+                                // Hide the button after successful generation
+                                if (btnAIExplain != null) {
+                                    btnAIExplain.setVisibility(View.GONE);
+                                }
                             } else {
-                                Toast.makeText(QuestionActivityNow.this, "AI chưa trả về nội dung. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show();
+                                if (txtAIExplain != null) {
+                                    txtAIExplain.setText("AI chưa trả về nội dung. Vui lòng thử lại.");
+                                }
+                                if (btnAIExplain != null) {
+                                    btnAIExplain.setVisibility(View.VISIBLE);
+                                    btnAIExplain.setEnabled(true);
+                                }
                             }
-                            btnAIExplain.setEnabled(true);
-                            btnAIExplain.setText("AI giải thích");
                         }
                     });
                 } catch (IOException | JSONException e) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(QuestionActivityNow.this, "Không kết nối được tới dịch vụ AI. Vui lòng kiểm tra mạng hoặc API key và thử lại.", Toast.LENGTH_LONG).show();
-                            btnAIExplain.setEnabled(true);
-                            btnAIExplain.setText("AI giải thích");
+                            if (progressAI != null) progressAI.setVisibility(View.GONE);
+                            
+                            String errorMsg = "Lỗi kết nối API. ";
+                            if (e.getMessage() != null && e.getMessage().contains("403")) {
+                                errorMsg = "API key không hợp lệ hoặc đã hết hạn. Vui lòng cập nhật key mới trong local.properties.";
+                            } else if (e.getMessage() != null) {
+                                errorMsg += e.getMessage();
+                            }
+                            
+                            if (txtAIExplain != null) {
+                                txtAIExplain.setText(errorMsg);
+                            }
+                            if (btnAIExplain != null) {
+                                btnAIExplain.setVisibility(View.VISIBLE);
+                                btnAIExplain.setEnabled(true);
+                            }
+                            Toast.makeText(QuestionActivityNow.this, errorMsg, Toast.LENGTH_LONG).show();
                         }
                     });
                 }

@@ -63,8 +63,14 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION && listener != null) {
-                        listener.onBookmarkClick(questions.get(position), position);
+                    if (position != RecyclerView.NO_POSITION && listener != null && questions != null && position < questions.size()) {
+                        Question question = questions.get(position);
+                        if (question != null) {
+                            android.util.Log.d("BookmarkAdapter", "Clicking question at position " + position);
+                            listener.onBookmarkClick(question, position);
+                        } else {
+                            android.util.Log.e("BookmarkAdapter", "Question is null at position " + position);
+                        }
                     }
                 }
             });
@@ -74,12 +80,20 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
             txtQuestionNumber.setText(String.valueOf(position + 1));
             txtQuestion.setText(question.getContent());
             
-            // Show category if available (you might need to add category info to Question model)
-            String category = "Câu hỏi đã đánh dấu";
+            // Show category/topic info if available
+            String category = "";
+            // You can add category name from question if available
+            // For now, only show critical badge
             if (question.getIs_critical() == 1) {
-                category += " • Điểm liệt";
+                category = "Điểm liệt";
             }
-            txtCategory.setText(category);
+            // Hide category TextView if empty
+            if (category.isEmpty()) {
+                txtCategory.setVisibility(View.GONE);
+            } else {
+                txtCategory.setVisibility(View.VISIBLE);
+                txtCategory.setText(category);
+            }
         }
     }
 }

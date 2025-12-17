@@ -49,4 +49,19 @@
     <string name="bottom_nav_mock">Thi thử</string>
     <string name="bottom_nav_more">Thêm</string>
     <string name="fab_quick_exam">Thi nhanh</string>
+    
+    <!-- Accessibility -->
+    <string name="nav_back">Quay lại</string>
+    <string name="bookmark">Đánh dấu</string>
+    <string name="content_desc_back_button">Quay lại</string>
+    <string name="content_desc_home_button">Về trang chủ</string>
+    <string name="content_desc_menu_button">Mở menu</string>
+    <string name="content_desc_search">Tìm kiếm</string>
+    <string name="content_desc_question_image">Hình ảnh câu hỏi</string>
+    <string name="content_desc_correct_answer">Đáp án đúng</string>
+    <string name="content_desc_wrong_answer">Đáp án sai</string>
+    <string name="content_desc_bookmark">Đánh dấu câu hỏi</string>
+    <string name="content_desc_chart">Biểu đồ thống kê</string>
+    <string name="content_desc_avatar">Ảnh đại diện người dùng</string>
+    <string name="content_desc_empty_state">Danh sách trống</string>
 </resources>

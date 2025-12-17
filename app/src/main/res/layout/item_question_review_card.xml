@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.App.Card.Large"
+    android:layout_marginBottom="@dimen/spacing_item_vertical"
+    android:contentDescription="@string/app_name">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_item_vertical">
+
+        <!-- Question Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/txt_question_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextSectionTitle"
+                android:text="Câu 1"
+                android:textColor="@color/color_text_primary" />
+
+            <!-- Status Chip -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chip_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/color_success">
+
+                <TextView
+                    android:id="@+id/txt_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/TextBadge"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="Đúng"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Critical Badge -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/badge_critical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:visibility="gone"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/color_warning">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/TextBadge"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="Điểm liệt"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <!-- Question Content -->
+        <TextView
+            android:id="@+id/txt_question_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextBody"
+            android:text="Nội dung câu hỏi..."
+            android:textColor="@color/color_text_primary"
+            android:lineSpacingMultiplier="1.2"
+            android:minHeight="48dp"
+            android:gravity="center_vertical" />
+
+        <!-- Question Image -->
+        <ImageView
+            android:id="@+id/img_question"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:maxHeight="300dp"
+            android:visibility="gone"
+            android:contentDescription="@string/app_name" />
+
+        <!-- Options Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp">
+
+            <!-- Option A -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_option_a"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="@dimen/radius_button"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/color_surface"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/color_outline"
+                android:minHeight="56dp"
+                android:contentDescription="@string/app_name">
+
+                <TextView
+                    android:id="@+id/txt_option_a"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextBody"
+                    android:padding="@dimen/spacing_item_vertical"
+                    android:text="A. Đáp án A"
+                    android:textColor="@color/color_text_primary"
+                    android:minHeight="48dp"
+                    android:gravity="center_vertical" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Option B -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_option_b"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="@dimen/radius_button"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/color_surface"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/color_outline"
+                android:minHeight="56dp"
+                android:contentDescription="@string/app_name">
+
+                <TextView
+                    android:id="@+id/txt_option_b"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextBody"
+                    android:padding="@dimen/spacing_item_vertical"
+                    android:text="B. Đáp án B"
+                    android:textColor="@color/color_text_primary"
+                    android:minHeight="48dp"
+                    android:gravity="center_vertical" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Option C -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_option_c"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                app:cardCornerRadius="@dimen/radius_button"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/color_surface"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/color_outline"
+                android:minHeight="56dp"
+                android:contentDescription="@string/app_name">
+
+                <TextView
+                    android:id="@+id/txt_option_c"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextBody"
+                    android:padding="@dimen/spacing_item_vertical"
+                    android:text="C. Đáp án C"
+                    android:textColor="@color/color_text_primary"
+                    android:minHeight="48dp"
+                    android:gravity="center_vertical" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Option D -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_option_d"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                app:cardCornerRadius="@dimen/radius_button"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/color_surface"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/color_outline"
+                android:minHeight="56dp"
+                android:contentDescription="@string/app_name">
+
+                <TextView
+                    android:id="@+id/txt_option_d"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextBody"
+                    android:padding="@dimen/spacing_item_vertical"
+                    android:text="D. Đáp án D"
+                    android:textColor="@color/color_text_primary"
+                    android:minHeight="48dp"
+                    android:gravity="center_vertical" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Explanation Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="@dimen/radius_card_small"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_surface_soft"
+            android:contentDescription="@string/app_name">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_item_vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextSectionTitle"
+                    android:text="Giải thích"
+                    android:textColor="@color/color_text_primary"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/txt_explanation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextBody"
+                    android:text="Giải thích chi tiết..."
+                    android:textColor="@color/color_text_secondary"
+                    android:lineSpacingMultiplier="1.3"
+                    android:minHeight="40dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
+

@@ -66,6 +66,9 @@
         <activity
             android:name=".HistoryActivity"
             android:exported="false" />
+        <activity
+            android:name=".QuestionDetailActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
