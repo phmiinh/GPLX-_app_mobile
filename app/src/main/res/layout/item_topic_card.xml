@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.App.Card.Large"
+    android:layout_marginBottom="@dimen/spacing_item_vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_item_vertical">
+
+        <!-- Topic Icon/Thumbnail -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_thumbnail"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:cardCornerRadius="@dimen/radius_thumbnail"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_surface_soft"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/img_topic_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_info_details"
+                app:tint="@color/color_primary"
+                android:contentDescription="@string/app_name" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Topic Name -->
+        <TextView
+            android:id="@+id/txt_topic_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/TextSectionTitle"
+            android:layout_marginStart="16dp"
+            android:text="Tên chủ đề"
+            android:textColor="@color/color_text_primary"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/card_thumbnail"
+            app:layout_constraintTop_toTopOf="@id/card_thumbnail"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Number of Questions -->
+        <TextView
+            android:id="@+id/txt_num_questions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/TextCaption"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="0 câu hỏi"
+            android:textColor="@color/color_text_secondary"
+            app:layout_constraintStart_toEndOf="@id/card_thumbnail"
+            app:layout_constraintTop_toBottomOf="@id/txt_topic_name"
+            app:layout_constraintEnd_toStartOf="@id/badge_accuracy"
+            app:layout_constraintBottom_toBottomOf="@id/card_thumbnail" />
+
+        <!-- Accuracy Badge (optional) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/badge_accuracy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_success"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/txt_num_questions"
+            app:layout_constraintBottom_toBottomOf="@id/txt_num_questions">
+
+            <TextView
+                android:id="@+id/txt_accuracy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextBadge"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="95%"
+                android:textColor="@android:color/white"
+                android:textSize="11sp" />
+        </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
+

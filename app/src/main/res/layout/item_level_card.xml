@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.App.Card.Large"
+    android:layout_marginBottom="@dimen/spacing_item_vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_page_horizontal">
+
+        <!-- Level Badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_level_badge"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_primary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/txt_level_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="B2"
+                android:textColor="@android:color/white"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Level Info -->
+        <TextView
+            android:id="@+id/txt_level_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/TextSectionTitle"
+            android:layout_marginStart="16dp"
+            android:text="Hạng B2"
+            android:textColor="@color/color_text_primary"
+            app:layout_constraintStart_toEndOf="@id/card_level_badge"
+            app:layout_constraintTop_toTopOf="@id/card_level_badge"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_level_requirements"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/TextCaption"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="Cần đúng ít nhất 21/25 câu"
+            android:textColor="@color/color_text_secondary"
+            app:layout_constraintStart_toEndOf="@id/card_level_badge"
+            app:layout_constraintTop_toBottomOf="@id/txt_level_title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_level_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/TextCaption"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="2dp"
+            android:text="Thời gian: 19 phút"
+            android:textColor="@color/color_text_secondary"
+            app:layout_constraintStart_toEndOf="@id/card_level_badge"
+            app:layout_constraintTop_toBottomOf="@id/txt_level_requirements"
+            app:layout_constraintEnd_toStartOf="@id/badge_best_score"
+            app:layout_constraintBottom_toBottomOf="@id/card_level_badge" />
+
+        <!-- Best Score Badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/badge_best_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_success"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/txt_level_time"
+            app:layout_constraintBottom_toBottomOf="@id/txt_level_time">
+
+            <TextView
+                android:id="@+id/txt_best_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextBadge"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="Best: 25/25"
+                android:textColor="@android:color/white"
+                android:textSize="11sp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Divider -->
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/color_divider"
+            app:layout_constraintTop_toBottomOf="@id/card_level_badge" />
+
+        <!-- Start Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_start_exam"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            style="@style/ButtonPrimary"
+            android:text="Bắt đầu thi"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
+

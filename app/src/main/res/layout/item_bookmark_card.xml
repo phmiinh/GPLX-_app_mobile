@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.App.Card.Large"
+    android:layout_marginBottom="@dimen/spacing_item_vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_item_vertical">
+
+        <!-- Question Number Badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/badge_number"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/color_surface_soft"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/txt_question_number"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/color_primary"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Question Text -->
+        <TextView
+            android:id="@+id/txt_question"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/TextBody"
+            android:layout_marginStart="12dp"
+            android:text="Nội dung câu hỏi sẽ hiển thị ở đây..."
+            android:textColor="@color/color_text_primary"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/badge_number"
+            app:layout_constraintTop_toTopOf="@id/badge_number"
+            app:layout_constraintEnd_toStartOf="@id/icon_bookmark" />
+
+        <!-- Bookmark Icon -->
+        <ImageView
+            android:id="@+id/icon_bookmark"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/btn_star_big_on"
+            app:tint="@color/color_primary"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/badge_number" />
+
+        <!-- Topic/Category -->
+        <TextView
+            android:id="@+id/txt_category"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/TextCaption"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:text="Chủ đề • Biển báo"
+            android:textColor="@color/color_text_secondary"
+            app:layout_constraintStart_toEndOf="@id/badge_number"
+            app:layout_constraintTop_toBottomOf="@id/txt_question"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/badge_number" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
+

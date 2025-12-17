@@ -5,19 +5,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.afinal.adapter.QuestionAdapter;
+import com.example.afinal.adapter.BookmarkAdapter;
 import com.example.afinal.analytics.AnalyticsRepository;
-import com.example.afinal.analytics.UserIdentity;
 import com.example.afinal.dbclass.Question;
 
 import java.util.ArrayList;
@@ -33,25 +27,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class BookmarksActivity extends AppCompatActivity {
+public class BookmarksActivity extends BaseNavigationActivity {
     private static final String TAG = "BookmarksActivity";
-    private ListView listView;
-    private Button back;
+    private RecyclerView rvBookmarks;
+    private LinearLayout emptyState;
     private SQLiteDatabase database = null;
     private AnalyticsRepository analyticsRepository;
-    private QuestionAdapter adapter;
+    private BookmarkAdapter adapter;
     private ArrayList<Question> questions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_question_review);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        setContentView(R.layout.activity_bookmarks);
+
+        // Setup navigation
+        setupToolbar(false, "Câu hỏi đã đánh dấu");
+        enableBottomBar(3); // More tab
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser == null || firebaseUser.isAnonymous()) {
@@ -62,7 +54,6 @@ public class BookmarksActivity extends AppCompatActivity {
 
         try {
             analyticsRepository = new AnalyticsRepository(this);
-            // Ensure schema is initialized
             analyticsRepository.ensureSchema();
 
             database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
@@ -73,33 +64,21 @@ public class BookmarksActivity extends AppCompatActivity {
                 return;
             }
 
-            listView = findViewById(R.id.lvQAR);
-            back = findViewById(R.id.btnQARback);
-            // Tuỳ chỉnh lại header cho màn bookmarks
-            android.widget.TextView info = findViewById(R.id.txtQARinfo);
-            if (info != null) {
-                info.setText("Câu hỏi đã đánh dấu");
-            }
-
-            if (listView == null || back == null) {
-                Log.e(TAG, "ListView or back button not found in layout");
-                Toast.makeText(this, "Lỗi giao diện", Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            }
+            // Initialize views
+            rvBookmarks = findViewById(R.id.rv_bookmarks);
+            emptyState = findViewById(R.id.empty_state);
 
             questions = new ArrayList<>();
-            adapter = new QuestionAdapter(this, R.layout.layout_listview_review, questions);
-            listView.setAdapter(adapter);
-
-            back.setOnClickListener(new View.OnClickListener() {
+            adapter = new BookmarkAdapter(this, questions, new BookmarkAdapter.OnBookmarkClickListener() {
                 @Override
-                public void onClick(View v) {
-                    finish();
+                public void onBookmarkClick(Question question, int position) {
+                    // TODO: Navigate to question detail or review
+                    Toast.makeText(BookmarksActivity.this, "Câu " + (position + 1), Toast.LENGTH_SHORT).show();
                 }
             });
+            rvBookmarks.setAdapter(adapter);
 
-            // Load bookmarks from Firestore trước; fallback SQLite nếu cần
+            // Load bookmarks from Firestore first; fallback to SQLite
             String userId = firebaseUser.getUid();
             loadBookmarksFromFirestore(userId);
 
@@ -214,8 +193,14 @@ public class BookmarksActivity extends AppCompatActivity {
             }
         }
         adapter.notifyDataSetChanged();
+        
+        // Show/hide empty state
         if (questions.isEmpty()) {
-            Toast.makeText(this, "Không tìm thấy nội dung cho các câu hỏi đã đánh dấu", Toast.LENGTH_SHORT).show();
+            emptyState.setVisibility(View.VISIBLE);
+            rvBookmarks.setVisibility(View.GONE);
+        } else {
+            emptyState.setVisibility(View.GONE);
+            rvBookmarks.setVisibility(View.VISIBLE);
         }
     }
 
