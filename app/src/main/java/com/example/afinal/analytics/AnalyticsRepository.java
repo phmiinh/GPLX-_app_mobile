@@ -61,6 +61,40 @@ public class AnalyticsRepository {
                 "total_questions INTEGER," +
                 "device_info TEXT" +
                 ")");
+        
+        // Migration: Add new columns if they don't exist (for existing databases)
+        try {
+            android.database.Cursor cursor = db.rawQuery("PRAGMA table_info(exam_sessions)", null);
+            java.util.Set<String> columns = new java.util.HashSet<>();
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    columns.add(cursor.getString(1)); // column name is at index 1
+                }
+                cursor.close();
+            }
+            
+            // Add missing columns
+            if (!columns.contains("level_id")) {
+                db.execSQL("ALTER TABLE exam_sessions ADD COLUMN level_id INTEGER");
+            }
+            if (!columns.contains("level_name")) {
+                db.execSQL("ALTER TABLE exam_sessions ADD COLUMN level_name TEXT");
+            }
+            if (!columns.contains("min_required")) {
+                db.execSQL("ALTER TABLE exam_sessions ADD COLUMN min_required INTEGER");
+            }
+            if (!columns.contains("total_questions")) {
+                db.execSQL("ALTER TABLE exam_sessions ADD COLUMN total_questions INTEGER");
+            }
+            if (!columns.contains("device_info")) {
+                db.execSQL("ALTER TABLE exam_sessions ADD COLUMN device_info TEXT");
+            }
+            if (!columns.contains("status")) {
+                db.execSQL("ALTER TABLE exam_sessions ADD COLUMN status TEXT");
+            }
+        } catch (Exception e) {
+            // Ignore migration errors - table might not exist yet
+        }
 
         // Practice sessions table - For practice mode (topic-based)
         db.execSQL("CREATE TABLE IF NOT EXISTS practice_sessions (" +
@@ -142,48 +176,103 @@ public class AnalyticsRepository {
     }
 
     public void upsertExamSession(Map<String, Object> data) {
-        SQLiteDatabase db = openDb();
-        ContentValues cv = new ContentValues();
-        cv.put("session_id", (String) data.get("session_id"));
-        cv.put("user_id", (String) data.get("user_id"));
-        // Renamed fields with backward compatibility
-        Object started = data.get("started_at_ms");
-        if (started == null) started = data.get("started_at");
-        if (started != null) cv.put("started_at_ms", started instanceof Long ? (Long) started : ((Number) started).longValue());
-        Object submitted = data.get("submitted_at_ms");
-        if (submitted == null) submitted = data.get("submitted_at");
-        if (submitted != null) cv.put("submitted_at_ms", submitted instanceof Long ? (Long) submitted : ((Number) submitted).longValue());
-        if (data.get("duration_ms") != null) cv.put("duration_ms", (Long) data.get("duration_ms"));
-        // blueprint_json - convert Map to JSON string
-        Object blueprint = data.get("blueprint_json");
-        if (blueprint == null) blueprint = data.get("blueprint_used"); // backward compatibility
-        if (blueprint != null) {
-            if (blueprint instanceof Map) {
-                try {
-                    cv.put("blueprint_json", new JSONObject((Map) blueprint).toString());
-                } catch (Exception e) {
+        SQLiteDatabase db = null;
+        try {
+            db = openDb();
+            // Ensure schema is up to date (migration)
+            ensureSchema();
+            
+            ContentValues cv = new ContentValues();
+            cv.put("session_id", (String) data.get("session_id"));
+            cv.put("user_id", (String) data.get("user_id"));
+            // Renamed fields with backward compatibility
+            Object started = data.get("started_at_ms");
+            if (started == null) started = data.get("started_at");
+            if (started != null) cv.put("started_at_ms", started instanceof Long ? (Long) started : ((Number) started).longValue());
+            Object submitted = data.get("submitted_at_ms");
+            if (submitted == null) submitted = data.get("submitted_at");
+            if (submitted != null) cv.put("submitted_at_ms", submitted instanceof Long ? (Long) submitted : ((Number) submitted).longValue());
+            if (data.get("duration_ms") != null) cv.put("duration_ms", (Long) data.get("duration_ms"));
+            // blueprint_json - convert Map to JSON string
+            Object blueprint = data.get("blueprint_json");
+            if (blueprint == null) blueprint = data.get("blueprint_used"); // backward compatibility
+            if (blueprint != null) {
+                if (blueprint instanceof Map) {
+                    try {
+                        cv.put("blueprint_json", new JSONObject((Map) blueprint).toString());
+                    } catch (Exception e) {
+                        cv.put("blueprint_json", blueprint.toString());
+                    }
+                } else {
                     cv.put("blueprint_json", blueprint.toString());
                 }
-            } else {
-                cv.put("blueprint_json", blueprint.toString());
             }
+            if (data.get("score_raw") != null) cv.put("score_raw", (Integer) data.get("score_raw"));
+            if (data.get("score_pct") != null) cv.put("score_pct", (Double) data.get("score_pct"));
+            if (data.get("num_correct") != null) cv.put("num_correct", (Integer) data.get("num_correct"));
+            if (data.get("num_incorrect") != null) cv.put("num_incorrect", (Integer) data.get("num_incorrect"));
+            Object numCriticalWrong = data.get("num_critical_wrong");
+            if (numCriticalWrong == null) numCriticalWrong = data.get("num_liet_wrong"); // backward compatibility
+            if (numCriticalWrong != null) cv.put("num_critical_wrong", (Integer) numCriticalWrong);
+            
+            // Check if columns exist before inserting (safe for old databases)
+            android.database.Cursor cursor = db.rawQuery("PRAGMA table_info(exam_sessions)", null);
+            java.util.Set<String> columns = new java.util.HashSet<>();
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    columns.add(cursor.getString(1));
+                }
+                cursor.close();
+            }
+            
+            // New fields for exam sessions - only insert if column exists
+            if (data.get("status") != null && columns.contains("status")) {
+                cv.put("status", (String) data.get("status"));
+            }
+            if (data.get("level_id") != null && columns.contains("level_id")) {
+                cv.put("level_id", (Integer) data.get("level_id"));
+            }
+            if (data.get("level_name") != null && columns.contains("level_name")) {
+                cv.put("level_name", (String) data.get("level_name"));
+            }
+            if (data.get("min_required") != null && columns.contains("min_required")) {
+                cv.put("min_required", (Integer) data.get("min_required"));
+            }
+            if (data.get("total_questions") != null && columns.contains("total_questions")) {
+                cv.put("total_questions", (Integer) data.get("total_questions"));
+            }
+            if (data.get("device_info") != null && columns.contains("device_info")) {
+                cv.put("device_info", (String) data.get("device_info"));
+            }
+            
+            db.insertWithOnConflict("exam_sessions", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        } catch (SQLiteException e) {
+            android.util.Log.e("AnalyticsRepository", "Error upserting exam session: " + e.getMessage(), e);
+            // Try to migrate schema and retry once
+            try {
+                if (db != null) {
+                    ensureSchema();
+                    // Retry insert with basic fields only
+                    ContentValues cvRetry = new ContentValues();
+                    cvRetry.put("session_id", (String) data.get("session_id"));
+                    cvRetry.put("user_id", (String) data.get("user_id"));
+                    Object started = data.get("started_at_ms");
+                    if (started == null) started = data.get("started_at");
+                    if (started != null) cvRetry.put("started_at_ms", started instanceof Long ? (Long) started : ((Number) started).longValue());
+                    Object submitted = data.get("submitted_at_ms");
+                    if (submitted == null) submitted = data.get("submitted_at");
+                    if (submitted != null) cvRetry.put("submitted_at_ms", submitted instanceof Long ? (Long) submitted : ((Number) submitted).longValue());
+                    if (data.get("score_raw") != null) cvRetry.put("score_raw", (Integer) data.get("score_raw"));
+                    if (data.get("num_correct") != null) cvRetry.put("num_correct", (Integer) data.get("num_correct"));
+                    if (data.get("num_incorrect") != null) cvRetry.put("num_incorrect", (Integer) data.get("num_incorrect"));
+                    db.insertWithOnConflict("exam_sessions", null, cvRetry, SQLiteDatabase.CONFLICT_REPLACE);
+                }
+            } catch (Exception e2) {
+                android.util.Log.e("AnalyticsRepository", "Retry failed: " + e2.getMessage(), e2);
+            }
+        } finally {
+            if (db != null) db.close();
         }
-        if (data.get("score_raw") != null) cv.put("score_raw", (Integer) data.get("score_raw"));
-        if (data.get("score_pct") != null) cv.put("score_pct", (Double) data.get("score_pct"));
-        if (data.get("num_correct") != null) cv.put("num_correct", (Integer) data.get("num_correct"));
-        if (data.get("num_incorrect") != null) cv.put("num_incorrect", (Integer) data.get("num_incorrect"));
-        Object numCriticalWrong = data.get("num_critical_wrong");
-        if (numCriticalWrong == null) numCriticalWrong = data.get("num_liet_wrong"); // backward compatibility
-        if (numCriticalWrong != null) cv.put("num_critical_wrong", (Integer) numCriticalWrong);
-        // New fields for exam sessions
-        if (data.get("status") != null) cv.put("status", (String) data.get("status"));
-        if (data.get("level_id") != null) cv.put("level_id", (Integer) data.get("level_id"));
-        if (data.get("level_name") != null) cv.put("level_name", (String) data.get("level_name"));
-        if (data.get("min_required") != null) cv.put("min_required", (Integer) data.get("min_required"));
-        if (data.get("total_questions") != null) cv.put("total_questions", (Integer) data.get("total_questions"));
-        if (data.get("device_info") != null) cv.put("device_info", (String) data.get("device_info"));
-        db.insertWithOnConflict("exam_sessions", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
     }
 
     public void upsertPracticeSession(Map<String, Object> data) {

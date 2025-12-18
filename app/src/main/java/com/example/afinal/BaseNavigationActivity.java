@@ -204,6 +204,25 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
         if (bottomAppBar != null && fab != null) {
             bottomBarEnabled = true;
             
+            // Set rounded top corners for BottomAppBar (Nomadstay style)
+            try {
+                float cornerRadius = getResources().getDimension(R.dimen.radius_card_large);
+                com.google.android.material.shape.MaterialShapeDrawable background = 
+                    (com.google.android.material.shape.MaterialShapeDrawable) bottomAppBar.getBackground();
+                if (background != null) {
+                    background.setShapeAppearanceModel(
+                        background.getShapeAppearanceModel()
+                            .toBuilder()
+                            .setTopLeftCorner(com.google.android.material.shape.CornerFamily.ROUNDED, cornerRadius)
+                            .setTopRightCorner(com.google.android.material.shape.CornerFamily.ROUNDED, cornerRadius)
+                            .build()
+                    );
+                }
+            } catch (Exception e) {
+                // Ignore if shape appearance cannot be set
+                android.util.Log.d("BaseNavigationActivity", "Could not set rounded corners: " + e.getMessage());
+            }
+            
             // Setup FAB click (Quick Mock Exam)
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
