@@ -55,6 +55,7 @@ public class SmartPracticeActivity extends BaseNavigationActivity {
 
         // Setup navigation toolbar
         setupToolbar(false, "Ôn thông minh (AI)");
+        enableBottomBar(3); // AI tab (0=Home, 1=Practice, 2=Mock, 3=AI)
 
         database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
         categoriesDAO = new CategoriesDAO(database);

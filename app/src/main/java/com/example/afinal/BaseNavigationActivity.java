@@ -199,9 +199,9 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
      */
     protected void enableBottomBar(int selectedTab) {
         bottomAppBar = findViewById(R.id.bottom_app_bar);
-        fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab); // FAB is optional now (removed from most screens)
         
-        if (bottomAppBar != null && fab != null) {
+        if (bottomAppBar != null) {
             bottomBarEnabled = true;
             
             // Set rounded top corners for BottomAppBar (Nomadstay style)
@@ -223,14 +223,7 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
                 android.util.Log.d("BaseNavigationActivity", "Could not set rounded corners: " + e.getMessage());
             }
             
-            // Setup FAB click (Quick Mock Exam)
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onFabClick();
-                }
-            });
-            
+            // FAB is no longer needed - removed per user request
             // Setup bottom bar menu clicks
             bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                 @Override
@@ -246,8 +239,8 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
                     } else if (id == R.id.bottom_nav_mock) {
                         navigateToLevel();
                         return true;
-                    } else if (id == R.id.bottom_nav_more) {
-                        // TODO: Show more menu or navigate to profile
+                    } else if (id == R.id.bottom_nav_ai) {
+                        navigateToSmartPractice();
                         return true;
                     }
                     return false;
@@ -294,6 +287,13 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
         String currentClassName = this.getClass().getSimpleName();
         if (!"LevelActivity".equals(currentClassName)) {
             startActivity(new Intent(this, LevelActivity.class));
+        }
+    }
+    
+    protected void navigateToSmartPractice() {
+        String currentClassName = this.getClass().getSimpleName();
+        if (!"SmartPracticeActivity".equals(currentClassName)) {
+            startActivity(new Intent(this, SmartPracticeActivity.class));
         }
     }
     

@@ -47,7 +47,7 @@
     <string name="bottom_nav_home">Trang chủ</string>
     <string name="bottom_nav_practice">Luyện tập</string>
     <string name="bottom_nav_mock">Thi thử</string>
-    <string name="bottom_nav_more">Thêm</string>
+    <string name="bottom_nav_ai">Ôn AI</string>
     <string name="fab_quick_exam">Thi nhanh</string>
     
     <!-- Accessibility -->

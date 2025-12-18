@@ -606,25 +606,10 @@
             android:layout_gravity="bottom"
             app:backgroundTint="@color/color_surface"
             app:elevation="@dimen/elev_bottom_bar"
-            app:fabCradleMargin="8dp"
-            app:fabCradleRoundedCornerRadius="16dp"
-            app:fabCradleVerticalOffset="4dp"
             app:menu="@menu/bottom_nav_menu"
             app:navigationIcon="@null"
             app:itemIconTint="@color/bottom_nav_icon_selector"
             app:itemTextColor="@color/bottom_nav_text_selector" />
-
-        <!-- FAB Quick Mock Exam - Nomadstay Style -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="@dimen/size_fab"
-            android:layout_height="@dimen/size_fab"
-            android:src="@android:drawable/ic_input_add"
-            app:tint="@color/color_on_primary"
-            app:backgroundTint="@color/color_primary"
-            app:elevation="@dimen/elev_fab"
-            app:layout_anchor="@id/bottom_app_bar"
-            android:contentDescription="@string/fab_quick_exam" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
