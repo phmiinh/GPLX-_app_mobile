@@ -458,7 +458,14 @@ public class QuestionActivityBase extends AppCompatActivity {
         }
         
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        String userId = (firebaseUser != null ? firebaseUser.getUid() : UserIdentity.getUserId(this));
+        // For Firestore, we MUST use the authenticated user's UID, not a generated one
+        // Firestore security rules require request.auth.uid == request.resource.data.user_id
+        String userId;
+        if (firebaseUser != null && !firebaseUser.isAnonymous()) {
+            userId = firebaseUser.getUid(); // Use authenticated UID for Firestore
+        } else {
+            userId = UserIdentity.getUserId(this); // Fallback for local DB only
+        }
         long now = System.currentTimeMillis();
         long durationMs = now - sessionStartAt;
         
@@ -519,12 +526,23 @@ public class QuestionActivityBase extends AppCompatActivity {
                 }
                 
                 // Save to Firestore (may fail if not authenticated or rules don't allow)
+                // IMPORTANT: Ensure user_id matches authenticated user for Firestore rules
                 if (firebaseUser != null && !firebaseUser.isAnonymous()) {
+                    // Double-check that user_id matches authenticated user
+                    if (!examSession.get("user_id").equals(firebaseUser.getUid())) {
+                        Log.w("QuestionActivityBase", "user_id mismatch! Setting to authenticated UID");
+                        examSession.put("user_id", firebaseUser.getUid());
+                    }
                     firestoreService.saveExamSession(examSession).addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.e("QuestionActivityBase", "Firestore save failed: " + e.getMessage(), e);
-                            String errorMsg = "Không lưu được lịch sử lên Firebase: " + e.getMessage();
+                            String errorMsg;
+                            if (e.getMessage() != null && e.getMessage().contains("PERMISSION_DENIED")) {
+                                errorMsg = "Lỗi quyền truy cập Firebase. Vui lòng kiểm tra Firestore Security Rules hoặc đăng nhập lại.";
+                            } else {
+                                errorMsg = "Không lưu được lịch sử lên Firebase: " + e.getMessage();
+                            }
                             // Show toast on main thread
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -571,12 +589,23 @@ public class QuestionActivityBase extends AppCompatActivity {
                 }
                 
                 // Save to Firestore
+                // IMPORTANT: Ensure user_id matches authenticated user for Firestore rules
                 if (firebaseUser != null && !firebaseUser.isAnonymous()) {
+                    // Double-check that user_id matches authenticated user
+                    if (!practiceSession.get("user_id").equals(firebaseUser.getUid())) {
+                        Log.w("QuestionActivityBase", "user_id mismatch! Setting to authenticated UID");
+                        practiceSession.put("user_id", firebaseUser.getUid());
+                    }
                     firestoreService.savePracticeSession(practiceSession).addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.e("QuestionActivityBase", "Firestore save failed: " + e.getMessage(), e);
-                            String errorMsg = "Không lưu được lịch sử lên Firebase: " + e.getMessage();
+                            String errorMsg;
+                            if (e.getMessage() != null && e.getMessage().contains("PERMISSION_DENIED")) {
+                                errorMsg = "Lỗi quyền truy cập Firebase. Vui lòng kiểm tra Firestore Security Rules hoặc đăng nhập lại.";
+                            } else {
+                                errorMsg = "Không lưu được lịch sử lên Firebase: " + e.getMessage();
+                            }
                             // Show toast on main thread
                             runOnUiThread(new Runnable() {
                                 @Override
