@@ -108,6 +108,13 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
         if (drawerLayout != null && navigationView != null) {
             drawerEnabled = true;
             
+            // Set scrim color programmatically (semi-transparent black overlay)
+            drawerLayout.setScrimColor(0x80000000);
+            
+            // Hide checkbox indicators by removing checkable behavior
+            // NavigationView will still highlight selected items via background
+            hideCheckboxIndicators();
+            
             // Setup drawer toggle (only if toolbar exists)
             if (toolbarView != null) {
                 ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -123,6 +130,9 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     int id = item.getItemId();
+                    
+                    // Set selected state (highlight current item) - but don't show checkbox
+                    item.setChecked(true);
                     
                     if (id == R.id.nav_dashboard) {
                         navigateToDashboard();
@@ -144,6 +154,42 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
                     return true;
                 }
             });
+            
+            // Set initial selected item based on current activity
+            setSelectedNavItem();
+        }
+    }
+    
+    /**
+     * Hide checkbox indicators in NavigationView by finding and hiding the checkbox views
+     */
+    private void hideCheckboxIndicators() {
+        if (navigationView == null) return;
+        
+        // Post to ensure view hierarchy is ready
+        navigationView.post(new Runnable() {
+            @Override
+            public void run() {
+                // Find all checkbox views in NavigationView and hide them
+                findAndHideCheckboxes(navigationView);
+            }
+        });
+    }
+    
+    /**
+     * Recursively find and hide checkbox views
+     */
+    private void findAndHideCheckboxes(View view) {
+        if (view instanceof android.widget.CheckBox) {
+            view.setVisibility(View.GONE);
+            return;
+        }
+        
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                findAndHideCheckboxes(group.getChildAt(i));
+            }
         }
     }
     
@@ -250,6 +296,37 @@ public abstract class BaseNavigationActivity extends AppCompatActivity {
         String currentClassName = this.getClass().getSimpleName();
         if (!"LeaderboardActivity".equals(currentClassName)) {
             startActivity(new Intent(this, LeaderboardActivity.class));
+        }
+    }
+    
+    /**
+     * Set the selected navigation item based on current activity
+     */
+    protected void setSelectedNavItem() {
+        if (navigationView == null) return;
+        
+        String currentClassName = this.getClass().getSimpleName();
+        int selectedId = 0;
+        
+        if ("DashboardActivity".equals(currentClassName)) {
+            selectedId = R.id.nav_dashboard;
+        } else if ("TopicActivity".equals(currentClassName)) {
+            selectedId = R.id.nav_topic;
+        } else if ("LevelActivity".equals(currentClassName)) {
+            selectedId = R.id.nav_level;
+        } else if ("BookmarksActivity".equals(currentClassName)) {
+            selectedId = R.id.nav_bookmarks;
+        } else if ("HistoryActivity".equals(currentClassName)) {
+            selectedId = R.id.nav_history;
+        } else if ("LeaderboardActivity".equals(currentClassName)) {
+            selectedId = R.id.nav_leaderboard;
+        }
+        
+        if (selectedId != 0) {
+            MenuItem item = navigationView.getMenu().findItem(selectedId);
+            if (item != null) {
+                item.setChecked(true);
+            }
         }
     }
 }

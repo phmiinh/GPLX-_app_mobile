@@ -17,8 +17,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/spacing_page_horizontal"
-            android:paddingTop="80dp"
-            android:paddingBottom="@dimen/spacing_section_vertical">
+            android:paddingTop="@dimen/spacing_section_vertical"
+            android:paddingBottom="100dp">
 
             <!-- Header Card -->
             <com.google.android.material.card.MaterialCardView
@@ -78,27 +78,31 @@
             app:titleTextColor="@color/color_text_primary" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Bottom App Bar -->
+    <!-- Bottom App Bar - Nomadstay Style -->
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottom_app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/height_bottom_bar"
         android:layout_gravity="bottom"
-        app:backgroundTint="@color/color_surface"
+        android:background="@drawable/bg_bottom_bar"
+        android:elevation="@dimen/elev_bottom_bar"
         app:fabCradleMargin="8dp"
         app:fabCradleRoundedCornerRadius="16dp"
         app:fabCradleVerticalOffset="4dp"
         app:menu="@menu/bottom_nav_menu"
-        app:navigationIcon="@null" />
+        app:navigationIcon="@null"
+        app:itemIconTint="@color/bottom_nav_icon_selector"
+        app:itemTextColor="@color/bottom_nav_text_selector" />
 
-    <!-- FAB Quick Mock Exam -->
+    <!-- FAB Quick Mock Exam - Nomadstay Style -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_fab"
+        android:layout_height="@dimen/size_fab"
         android:src="@android:drawable/ic_input_add"
         app:tint="@color/color_on_primary"
         app:backgroundTint="@color/color_primary"
+        app:elevation="@dimen/elev_fab"
         app:layout_anchor="@id/bottom_app_bar"
         android:contentDescription="@string/fab_quick_exam" />
 

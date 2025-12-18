@@ -95,4 +95,10 @@
     <color name="answer_text_correct">#166534</color>
     <color name="answer_text_incorrect">#991B1B</color>
     <color name="answer_text_selected">@color/color_text_primary</color>
+    
+    <!-- Navigation drawer item colors -->
+    <color name="nav_item_icon_selected">@color/color_on_primary</color>
+    <color name="nav_item_icon_normal">@color/color_text_primary</color>
+    <color name="nav_item_text_selected">@color/color_on_primary</color>
+    <color name="nav_item_text_normal">@color/color_text_primary</color>
 </resources>

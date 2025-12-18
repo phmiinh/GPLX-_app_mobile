@@ -13,12 +13,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import com.example.afinal.DAO.CategoriesDAO;
 import com.example.afinal.DAO.QuestionDAO;
 import com.example.afinal.analytics.AnalyticsHelper;
@@ -35,7 +29,7 @@ import java.util.Map;
  * Lets the user pick mode, topic and number of questions, then calls
  * the recommendation service and starts the appropriate question flow.
  */
-public class SmartPracticeActivity extends AppCompatActivity {
+public class SmartPracticeActivity extends BaseNavigationActivity {
 
     private Spinner modeSpinner;
     private Spinner topicSpinner;
@@ -57,13 +51,10 @@ public class SmartPracticeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_smart_practice);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        // Setup navigation toolbar
+        setupToolbar(false, "Ôn thông minh (AI)");
 
         database = openOrCreateDatabase("ATGT.db", MODE_PRIVATE, null);
         categoriesDAO = new CategoriesDAO(database);

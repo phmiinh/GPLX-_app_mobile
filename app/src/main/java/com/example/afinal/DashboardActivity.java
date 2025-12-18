@@ -107,6 +107,12 @@ public class DashboardActivity extends BaseNavigationActivity {
         setupCharts();
         loadStatsIfLoggedIn();
     }
+    
+    @Override
+    protected void onFabClick() {
+        // Override FAB behavior - navigate to Smart Practice instead of Level
+        startActivity(new Intent(this, SmartPracticeActivity.class));
+    }
 
     @Override
     protected void onResume() {

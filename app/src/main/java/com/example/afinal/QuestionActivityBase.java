@@ -411,8 +411,8 @@ public class QuestionActivityBase extends AppCompatActivity {
         // Log last question attempt if not already logged
         // Wrap in try-catch to prevent crashes that would prevent dialog from showing
         try {
-            if (questionStartAt > 0 ) {
-                logAttemptForCurrent();
+        if (questionStartAt > 0 ) {
+            logAttemptForCurrent();
             }
         } catch (Exception e) {
             Log.e("QuestionActivityBase", "Error logging last question attempt", e);
@@ -491,17 +491,17 @@ public class QuestionActivityBase extends AppCompatActivity {
                 // blueprint_json
                 if (rule != null && !rule.isEmpty()) {
                     examSession.put("blueprint_json", buildBlueprintJson());
-                } else if (sessionMode != null && sessionMode.equals("ai_mock_exam") && listQuestion != null) {
-                    HashMap<String, Integer> blueprintAi = new HashMap<>();
-                    for (Question q : listQuestion) {
-                        String key = String.valueOf(q.getTopic_id());
-                        int current = blueprintAi.containsKey(key) ? blueprintAi.get(key) : 0;
-                        blueprintAi.put(key, current + 1);
-                    }
+        } else if (sessionMode != null && sessionMode.equals("ai_mock_exam") && listQuestion != null) {
+            HashMap<String, Integer> blueprintAi = new HashMap<>();
+            for (Question q : listQuestion) {
+                String key = String.valueOf(q.getTopic_id());
+                int current = blueprintAi.containsKey(key) ? blueprintAi.get(key) : 0;
+                blueprintAi.put(key, current + 1);
+            }
                     examSession.put("blueprint_json", blueprintAi);
-                } else {
+        } else {
                     examSession.put("blueprint_json", new HashMap<String, Integer>());
-                }
+        }
                 
                 examSession.put("score_raw", truecnt);
                 examSession.put("score_pct", count == 0 ? 0.0 : (truecnt * 100.0) / count);
@@ -510,10 +510,10 @@ public class QuestionActivityBase extends AppCompatActivity {
                 examSession.put("num_critical_wrong", numCriticalWrong);
                 examSession.put("status", status);  // "Đỗ" or "Trượt"
                 examSession.put("level_id", level);
-                String levelName = intent.getStringExtra("name");
-                if (levelName != null) {
+            String levelName = intent.getStringExtra("name");
+            if (levelName != null) {
                     examSession.put("level_name", levelName);
-                }
+            }
                 examSession.put("min_required", min);
                 examSession.put("total_questions", count);
                 
@@ -648,14 +648,14 @@ public class QuestionActivityBase extends AppCompatActivity {
                 // Navigate to review screen
                 try {
                     Intent nextIntent=new Intent(QuestionActivityBase.this,QuestionActivityReview.class);
-                    nextIntent.putParcelableArrayListExtra("listQuestion",listQuestion);
-                    nextIntent.putExtra("result",msg);
-                    nextIntent.putExtra("startTime",startTime);
-                    nextIntent.putExtra("endTime",endTime);
-                    nextIntent.putExtra("time",getTimeTest());
-                    startActivity(nextIntent);
+                nextIntent.putParcelableArrayListExtra("listQuestion",listQuestion);
+                nextIntent.putExtra("result",msg);
+                nextIntent.putExtra("startTime",startTime);
+                nextIntent.putExtra("endTime",endTime);
+                nextIntent.putExtra("time",getTimeTest());
+                startActivity(nextIntent);
                     // Only finish after successfully starting the review activity
-                    finish();
+                finish();
                 } catch (Exception e) {
                     Log.e("QuestionActivityBase", "Error navigating to review screen", e);
                     Toast.makeText(QuestionActivityBase.this, "Lỗi khi mở màn hình xem lại", Toast.LENGTH_SHORT).show();
@@ -666,8 +666,8 @@ public class QuestionActivityBase extends AppCompatActivity {
         
         // Ensure dialog is shown even if there were errors
         try {
-            AlertDialog alertDialog=builder1.create();
-            alertDialog.show();
+        AlertDialog alertDialog=builder1.create();
+        alertDialog.show();
         } catch (Exception e) {
             Log.e("QuestionActivityBase", "Error showing results dialog", e);
             // Fallback: show toast and finish
