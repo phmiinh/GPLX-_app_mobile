@@ -181,6 +181,54 @@ public class FirestoreService {
         }
         return converted;
     }
+
+    /**
+     * Upsert IRT parameters for a question (b_item, a_item)
+     */
+    public Task<Void> upsertIRTParams(String questionId, Map<String, Object> data) {
+        Log.d(TAG, "Upserting IRT params for questionId: " + questionId);
+        Task<Void> task = db.collection("irt_params").document(questionId).set(new HashMap<>(data), com.google.firebase.firestore.SetOptions.merge());
+        task.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "IRT params upserted successfully for questionId: " + questionId);
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG, "Error upserting IRT params for questionId: " + questionId, e);
+            }
+        });
+        return task;
+    }
+
+    /**
+     * Upsert user IRT parameters (theta_user)
+     */
+    public Task<Void> upsertUserIRTParams(String userId, double thetaUser) {
+        Log.d(TAG, "Upserting user IRT params for userId: " + userId);
+        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> irtParams = new HashMap<>();
+        irtParams.put("theta_user", thetaUser);
+        irtParams.put("last_updated_ms", System.currentTimeMillis());
+        data.put("irt_params", irtParams);
+        
+        Task<Void> task = db.collection("users").document(userId).set(data, com.google.firebase.firestore.SetOptions.merge());
+        task.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "User IRT params upserted successfully for userId: " + userId);
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG, "Error upserting user IRT params for userId: " + userId, e);
+            }
+        });
+        return task;
+    }
 }
 
 

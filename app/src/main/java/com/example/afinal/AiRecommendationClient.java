@@ -39,17 +39,71 @@ public class AiRecommendationClient {
     private static final String TAG = "AiRecommendationClient";
     private static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
+    private static final int DEFAULT_TIMEOUT_SECONDS = 10;
+    private static final int MAX_RETRIES = 2;
 
     private final OkHttpClient client;
     private final String baseUrl;
 
     public AiRecommendationClient() {
-        this(new OkHttpClient(), BuildConfig.AI_API_BASE_URL);
+        OkHttpClient defaultClient = new OkHttpClient.Builder()
+                .connectTimeout(DEFAULT_TIMEOUT_SECONDS, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(DEFAULT_TIMEOUT_SECONDS, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(DEFAULT_TIMEOUT_SECONDS, java.util.concurrent.TimeUnit.SECONDS)
+                .build();
+        this.client = defaultClient;
+        this.baseUrl = BuildConfig.AI_API_BASE_URL;
+        Log.d(TAG, "AiRecommendationClient initialized with baseUrl: " + this.baseUrl);
     }
 
     public AiRecommendationClient(OkHttpClient client, String baseUrl) {
         this.client = client;
         this.baseUrl = baseUrl != null ? baseUrl.trim() : "";
+    }
+
+    /**
+     * Request recommendations with retry logic and exponential backoff
+     */
+    public void requestRecommendationsWithRetry(
+            Context context,
+            String mode,
+            Integer topicId,
+            int numQuestions,
+            boolean criticalOnly,
+            RecommendationCallback callback
+    ) {
+        requestRecommendationsWithRetry(context, mode, topicId, numQuestions, criticalOnly, callback, 0);
+    }
+
+    private void requestRecommendationsWithRetry(
+            Context context,
+            String mode,
+            Integer topicId,
+            int numQuestions,
+            boolean criticalOnly,
+            RecommendationCallback callback,
+            int retryCount
+    ) {
+        requestRecommendations(context, mode, topicId, numQuestions, criticalOnly, new RecommendationCallback() {
+            @Override
+            public void onSuccess(List<String> questionIds, List<Map<String, Object>> metadata) {
+                callback.onSuccess(questionIds, metadata);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (retryCount < MAX_RETRIES && (e instanceof IOException || (e.getMessage() != null && e.getMessage().contains("timeout")))) {
+                    // Exponential backoff: wait 2^retryCount seconds
+                    long delayMs = (long) Math.pow(2, retryCount) * 1000;
+                    Log.d(TAG, "Retrying request after " + delayMs + "ms (attempt " + (retryCount + 1) + "/" + MAX_RETRIES + ")");
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                        requestRecommendationsWithRetry(context, mode, topicId, numQuestions, criticalOnly, callback, retryCount + 1);
+                    }, delayMs);
+                } else {
+                    callback.onError(e);
+                }
+            }
+        });
     }
 
     public void requestRecommendations(
@@ -60,12 +114,16 @@ public class AiRecommendationClient {
             boolean criticalOnly,
             RecommendationCallback callback
     ) {
+        Log.d(TAG, "requestRecommendations called - baseUrl: " + baseUrl + ", mode: " + mode + ", topicId: " + topicId);
+        
         if (baseUrl.isEmpty()) {
+            Log.e(TAG, "AI_API_BASE_URL is empty! Falling back to heuristic.");
             callback.onError(new IllegalStateException("AI_API_BASE_URL is empty. Configure it in local.properties or BuildConfig."));
             return;
         }
 
         String userId = UserIdentity.getUserId(context);
+        Log.d(TAG, "User ID: " + userId);
 
         try {
             JSONObject body = new JSONObject();
@@ -88,20 +146,26 @@ public class AiRecommendationClient {
             }
             body.put("filters", filters);
 
+            final String url = baseUrl + "/api/v1/recommendations";
+            Log.d(TAG, "Making API request to: " + url);
+            Log.d(TAG, "Request body: " + body.toString());
+            
             Request request = new Request.Builder()
-                    .url(baseUrl + "/api/v1/recommendations")
+                    .url(url)
                     .post(RequestBody.create(body.toString(), JSON))
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    Log.e(TAG, "Recommendation API call failed", e);
+                    Log.e(TAG, "Recommendation API call failed: " + e.getMessage(), e);
+                    Log.e(TAG, "URL was: " + url);
                     callback.onError(e);
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
+                    Log.d(TAG, "API response received: " + response.code());
                     if (!response.isSuccessful()) {
                         String body = response.body() != null ? response.body().string() : "";
                         Log.e(TAG, "Recommendation API error: " + response.code() + " body=" + body);
@@ -109,6 +173,7 @@ public class AiRecommendationClient {
                         return;
                     }
                     String respBody = response.body() != null ? response.body().string() : "";
+                    Log.d(TAG, "API response body length: " + respBody.length());
                     try {
                         JSONObject root = new JSONObject(respBody);
                         JSONObject data = root.getJSONObject("data");

@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
     // OkHttp for simple REST call to Gemini API (test-only usage for now)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
@@ -64,6 +66,8 @@ dependencies {
     testImplementation("org.json:json:20240303")
     implementation("org.json:json:20240303")
     testImplementation(libs.junit)
+    testImplementation("org.robolectric:robolectric:4.11.1")
+    testImplementation("org.mockito:mockito-core:5.1.1")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
@@ -73,6 +77,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
 
     implementation("com.google.firebase:firebase-firestore")
+
+    implementation("com.google.firebase:firebase-analytics")
 
     // MPAndroidChart for dashboard charts
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
