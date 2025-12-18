@@ -50,7 +50,7 @@ import java.util.UUID;
 public class QuestionActivityBase extends AppCompatActivity {
     protected TextView topicname, content, timer;
     protected ImageButton back;
-    protected Button submit;
+    protected Button submit,next;
     protected SQLiteDatabase database = null;
     protected RadioButton a, b, c, d;
     protected ImageView imgQuestion;
@@ -153,6 +153,7 @@ public class QuestionActivityBase extends AppCompatActivity {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull RadioGroup group, int checkedId) {
+                if(next.getText().toString().equals("Câu tiếp theo")) return;
                 if (checkedId != -1) {
                     RadioButton selected = findViewById(checkedId);
                     if (selected != null) {

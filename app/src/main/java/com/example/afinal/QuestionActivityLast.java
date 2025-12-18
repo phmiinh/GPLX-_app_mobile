@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class QuestionActivityLast extends QuestionActivityBase {
-    private Button next,prev;
+    private Button prev;
     private TextView explain;
     private View explanationSection;
     @Override

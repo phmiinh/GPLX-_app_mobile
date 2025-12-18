@@ -35,7 +35,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 public class QuestionActivityNow extends QuestionActivityBase {
-    private Button next;
+
     private TextView explain;
     private Button btnAIExplain;
     private TextView txtAIExplain;
