@@ -131,26 +131,19 @@ public class QuestionActivityLast extends QuestionActivityBase {
             else if (selected.equals(b.getText().toString())) b.setChecked(true);
             else if (selected.equals(c.getText().toString())) c.setChecked(true);
             else if (selected.equals(d.getText().toString())) d.setChecked(true);
-            
-            // Show explanation and highlight answers (this is review mode)
-            if (explain != null && question.getExplain() != null && !question.getExplain().isEmpty()) {
-                explain.setText(question.getExplain());
-                if (explanationSection != null) {
-                    explanationSection.setVisibility(View.VISIBLE);
-                }
-            }
-            
-            // Highlight correct (green) and incorrect (red) answers
-            AnswerColorHelper.showAnswerWithColors(a, b, c, d, radioGroup, question.getAnswer());
         }
         else {
             radioGroup.clearCheck();
             question.setUserChoice(null);
             listQuestion.get(anInt).setUserChoice(null);
-            AnswerColorHelper.resetAnswerColors(a, b, c, d);
-            if (explanationSection != null) {
-                explanationSection.setVisibility(View.GONE);
-            }
+        }
+        
+        // IMPORTANT: QuestionActivityLast is an "exam taking" screen.
+        // Prev/Next must ONLY navigate questions. Answers/explanations are shown
+        // only after submit, inside QuestionActivityReview.
+        AnswerColorHelper.resetAnswerColors(a, b, c, d);
+        if (explanationSection != null) {
+            explanationSection.setVisibility(View.GONE);
         }
     }
 }

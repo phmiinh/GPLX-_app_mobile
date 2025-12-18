@@ -133,12 +133,15 @@ public class QuestionActivityNow extends QuestionActivityBase {
                         aiExplanationSection.setVisibility(View.VISIBLE);
                     }
                     if (btnAIExplain != null) {
+                        btnAIExplain.setVisibility(View.VISIBLE);  // Đảm bảo button hiện lại
                         btnAIExplain.setEnabled(true);
                         btnAIExplain.setText("Tạo giải thích");
                     }
                     if (txtAIExplain != null) {
                         txtAIExplain.setText("Nhấn nút \"Tạo giải thích\" bên dưới để AI phân tích chi tiết câu hỏi này.");
                     }
+                    // Reset AI usage flag for new question check
+                    aiUsedForCurrentQuestion = false;
                     
                     next.setText("Câu tiếp theo");
                     // Highlight correct (green) and incorrect (red) answers
@@ -160,6 +163,17 @@ public class QuestionActivityNow extends QuestionActivityBase {
                     }
                     if (aiExplanationSection != null) {
                         aiExplanationSection.setVisibility(View.GONE);
+                    }
+                    // Reset AI explanation button state for next question
+                    if (btnAIExplain != null) {
+                        btnAIExplain.setVisibility(View.VISIBLE);  // Đảm bảo button sẵn sàng cho câu tiếp theo
+                        btnAIExplain.setEnabled(false);  // Disable cho đến khi bấm "Kiểm tra"
+                    }
+                    if (txtAIExplain != null) {
+                        txtAIExplain.setText("");
+                    }
+                    if (progressAI != null) {
+                        progressAI.setVisibility(View.GONE);
                     }
                 }
             }

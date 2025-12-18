@@ -41,7 +41,7 @@ public class AnalyticsRepository {
                 "skipped INTEGER" +  // New field (boolean as int)
                 ")");
 
-        // Exam sessions table - Updated schema
+        // Exam sessions table - Updated schema (only for mock exams)
         db.execSQL("CREATE TABLE IF NOT EXISTS exam_sessions (" +
                 "session_id TEXT PRIMARY KEY," +
                 "user_id TEXT NOT NULL," +
@@ -54,6 +54,32 @@ public class AnalyticsRepository {
                 "num_correct INTEGER," +
                 "num_incorrect INTEGER," +
                 "num_critical_wrong INTEGER," +
+                "status TEXT," +  // "Đỗ" or "Trượt"
+                "level_id INTEGER," +
+                "level_name TEXT," +
+                "min_required INTEGER," +
+                "total_questions INTEGER," +
+                "device_info TEXT" +
+                ")");
+
+        // Practice sessions table - For practice mode (topic-based)
+        db.execSQL("CREATE TABLE IF NOT EXISTS practice_sessions (" +
+                "session_id TEXT PRIMARY KEY," +
+                "user_id TEXT NOT NULL," +
+                "started_at_ms INTEGER," +
+                "submitted_at_ms INTEGER," +
+                "duration_ms INTEGER," +
+                "score_raw INTEGER," +
+                "score_pct REAL," +
+                "num_correct INTEGER," +
+                "num_incorrect INTEGER," +
+                "num_critical_wrong INTEGER," +
+                "topic_id INTEGER," +
+                "topic_name TEXT," +
+                "start_question INTEGER," +
+                "end_question INTEGER," +
+                "total_questions INTEGER," +
+                "mode TEXT," +  // "practice_topic" or "ai_practice"
                 "device_info TEXT" +
                 ")");
 
@@ -149,8 +175,44 @@ public class AnalyticsRepository {
         Object numCriticalWrong = data.get("num_critical_wrong");
         if (numCriticalWrong == null) numCriticalWrong = data.get("num_liet_wrong"); // backward compatibility
         if (numCriticalWrong != null) cv.put("num_critical_wrong", (Integer) numCriticalWrong);
+        // New fields for exam sessions
+        if (data.get("status") != null) cv.put("status", (String) data.get("status"));
+        if (data.get("level_id") != null) cv.put("level_id", (Integer) data.get("level_id"));
+        if (data.get("level_name") != null) cv.put("level_name", (String) data.get("level_name"));
+        if (data.get("min_required") != null) cv.put("min_required", (Integer) data.get("min_required"));
+        if (data.get("total_questions") != null) cv.put("total_questions", (Integer) data.get("total_questions"));
         if (data.get("device_info") != null) cv.put("device_info", (String) data.get("device_info"));
         db.insertWithOnConflict("exam_sessions", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+    }
+
+    public void upsertPracticeSession(Map<String, Object> data) {
+        SQLiteDatabase db = openDb();
+        ContentValues cv = new ContentValues();
+        cv.put("session_id", (String) data.get("session_id"));
+        cv.put("user_id", (String) data.get("user_id"));
+        Object started = data.get("started_at_ms");
+        if (started == null) started = data.get("started_at");
+        if (started != null) cv.put("started_at_ms", started instanceof Long ? (Long) started : ((Number) started).longValue());
+        Object submitted = data.get("submitted_at_ms");
+        if (submitted == null) submitted = data.get("submitted_at");
+        if (submitted != null) cv.put("submitted_at_ms", submitted instanceof Long ? (Long) submitted : ((Number) submitted).longValue());
+        if (data.get("duration_ms") != null) cv.put("duration_ms", (Long) data.get("duration_ms"));
+        if (data.get("score_raw") != null) cv.put("score_raw", (Integer) data.get("score_raw"));
+        if (data.get("score_pct") != null) cv.put("score_pct", (Double) data.get("score_pct"));
+        if (data.get("num_correct") != null) cv.put("num_correct", (Integer) data.get("num_correct"));
+        if (data.get("num_incorrect") != null) cv.put("num_incorrect", (Integer) data.get("num_incorrect"));
+        Object numCriticalWrong = data.get("num_critical_wrong");
+        if (numCriticalWrong == null) numCriticalWrong = data.get("num_liet_wrong");
+        if (numCriticalWrong != null) cv.put("num_critical_wrong", (Integer) numCriticalWrong);
+        if (data.get("topic_id") != null) cv.put("topic_id", (Integer) data.get("topic_id"));
+        if (data.get("topic_name") != null) cv.put("topic_name", (String) data.get("topic_name"));
+        if (data.get("start_question") != null) cv.put("start_question", (Integer) data.get("start_question"));
+        if (data.get("end_question") != null) cv.put("end_question", (Integer) data.get("end_question"));
+        if (data.get("total_questions") != null) cv.put("total_questions", (Integer) data.get("total_questions"));
+        if (data.get("mode") != null) cv.put("mode", (String) data.get("mode"));
+        if (data.get("device_info") != null) cv.put("device_info", (String) data.get("device_info"));
+        db.insertWithOnConflict("practice_sessions", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
     

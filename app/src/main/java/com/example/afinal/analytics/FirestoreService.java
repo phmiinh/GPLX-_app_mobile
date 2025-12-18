@@ -40,7 +40,11 @@ public class FirestoreService {
 
     public Task<DocumentReference> saveExamSession(Map<String, Object> data) {
         Log.d(TAG, "Saving exam session to Firestore: " + data);
-        Task<DocumentReference> task = db.collection("exam_sessions").add(new HashMap<>(data));
+        
+        // Convert data to Firestore-compatible format
+        Map<String, Object> firestoreData = convertToFirestoreFormat(data);
+        
+        Task<DocumentReference> task = db.collection("exam_sessions").add(firestoreData);
         task.addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
@@ -50,7 +54,32 @@ public class FirestoreService {
         task.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                Log.e(TAG, "Error saving exam session to Firestore", e);
+                Log.e(TAG, "Error saving exam session to Firestore: " + e.getMessage(), e);
+                // Log full stack trace for debugging
+                e.printStackTrace();
+            }
+        });
+        return task;
+    }
+
+    public Task<DocumentReference> savePracticeSession(Map<String, Object> data) {
+        Log.d(TAG, "Saving practice session to Firestore: " + data);
+        
+        // Convert data to Firestore-compatible format
+        Map<String, Object> firestoreData = convertToFirestoreFormat(data);
+        
+        Task<DocumentReference> task = db.collection("practice_sessions").add(firestoreData);
+        task.addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                Log.d(TAG, "Practice session saved successfully with ID: " + documentReference.getId());
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG, "Error saving practice session to Firestore: " + e.getMessage(), e);
+                e.printStackTrace();
             }
         });
         return task;
@@ -112,6 +141,45 @@ public class FirestoreService {
             }
         });
         return task;
+    }
+    
+    /**
+     * Convert Map data to Firestore-compatible format:
+     * - Convert Integer to Long (Firestore prefers Long for numbers)
+     * - Ensure HashMap values are properly serialized
+     * - Handle nested maps recursively
+     */
+    private Map<String, Object> convertToFirestoreFormat(Map<String, Object> data) {
+        Map<String, Object> converted = new HashMap<>();
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            
+            if (value == null) {
+                converted.put(key, null);
+            } else if (value instanceof Integer) {
+                // Convert Integer to Long for Firestore compatibility
+                converted.put(key, ((Integer) value).longValue());
+            } else if (value instanceof HashMap) {
+                // Recursively convert nested HashMaps
+                @SuppressWarnings("unchecked")
+                HashMap<String, Object> nestedMap = (HashMap<String, Object>) value;
+                Map<String, Object> convertedNested = new HashMap<>();
+                for (Map.Entry<String, Object> nestedEntry : nestedMap.entrySet()) {
+                    Object nestedValue = nestedEntry.getValue();
+                    if (nestedValue instanceof Integer) {
+                        convertedNested.put(nestedEntry.getKey(), ((Integer) nestedValue).longValue());
+                    } else {
+                        convertedNested.put(nestedEntry.getKey(), nestedValue);
+                    }
+                }
+                converted.put(key, convertedNested);
+            } else {
+                // Keep other types as-is (String, Long, Double, Boolean, etc.)
+                converted.put(key, value);
+            }
+        }
+        return converted;
     }
 }
 

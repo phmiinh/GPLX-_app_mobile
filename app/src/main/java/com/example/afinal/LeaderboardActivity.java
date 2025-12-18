@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.afinal.adapter.LeaderboardAdapter;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -87,7 +88,61 @@ public class LeaderboardActivity extends BaseNavigationActivity {
             }
         }
 
+        // Lấy tất cả unique user IDs để query display_name
+        List<String> userIds = new ArrayList<>(userStatsMap.keySet());
+        
+        if (userIds.isEmpty()) {
+            txtPlaceholder.setText("Chưa có dữ liệu bảng xếp hạng");
+            txtPlaceholder.setVisibility(View.VISIBLE);
+            rvLeaderboard.setVisibility(View.GONE);
+            return;
+        }
+
+        // Query users collection để lấy display_name
+        // Firestore whereIn() có giới hạn 10 items, nên cần chia nhỏ nếu > 10 users
+        loadUserNames(userIds, userStatsMap);
+    }
+
+    private void loadUserNames(List<String> userIds, Map<String, UserStats> userStatsMap) {
+        Map<String, String> userIdToDisplayName = new HashMap<>();
+        final int[] completedQueries = {0};
+        final int totalQueries = userIds.size();
+
+        if (totalQueries == 0) {
+            buildLeaderboardRows(userStatsMap, userIdToDisplayName);
+            return;
+        }
+
+        // Query từng user document để lấy display_name
+        for (String userId : userIds) {
+            db.collection("users").document(userId).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String displayName = documentSnapshot.getString("display_name");
+                            if (displayName != null && !displayName.isEmpty()) {
+                                userIdToDisplayName.put(userId, displayName);
+                            }
+                        }
+                        
+                        completedQueries[0]++;
+                        if (completedQueries[0] >= totalQueries) {
+                            // Tất cả queries đã hoàn thành, tạo leaderboard rows
+                            buildLeaderboardRows(userStatsMap, userIdToDisplayName);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // Nếu query user thất bại, bỏ qua và tiếp tục
+                        completedQueries[0]++;
+                        if (completedQueries[0] >= totalQueries) {
+                            buildLeaderboardRows(userStatsMap, userIdToDisplayName);
+                        }
+                    });
+        }
+    }
+
+    private void buildLeaderboardRows(Map<String, UserStats> userStatsMap, Map<String, String> userIdToDisplayName) {
         leaderboardRows.clear();
+        
         for (Map.Entry<String, UserStats> entry : userStatsMap.entrySet()) {
             String userId = entry.getKey();
             UserStats stats = entry.getValue();
@@ -95,9 +150,16 @@ public class LeaderboardActivity extends BaseNavigationActivity {
                 ? (double) stats.totalScore / stats.examCount 
                 : 0.0;
 
+            // Lấy display_name, nếu không có thì dùng userId rút ngắn
+            String displayName = userIdToDisplayName.get(userId);
+            if (displayName == null || displayName.isEmpty()) {
+                // Rút ngắn userId để hiển thị (lấy 8 ký tự đầu + "...")
+                displayName = userId.length() > 8 ? userId.substring(0, 8) + "..." : userId;
+            }
+
             leaderboardRows.add(new LeaderboardAdapter.LeaderboardRow(
                 0, // rank will be set after sorting
-                userId,
+                displayName,
                 stats.bestScore,
                 avgScore,
                 stats.examCount

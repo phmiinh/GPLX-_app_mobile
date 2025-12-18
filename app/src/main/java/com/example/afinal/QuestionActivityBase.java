@@ -386,8 +386,13 @@ public class QuestionActivityBase extends AppCompatActivity {
                 builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        // Cancel timer to prevent race conditions
+                        if (countDownTimer != null) {
+                            countDownTimer.cancel();
+                        }
                         endTime=getTime();
-                        showpoint(context);
+                        // Use 'this' instead of context to ensure we're using the activity context
+                        showpoint(QuestionActivityBase.this);
                     }
                 });
                 builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
@@ -404,8 +409,14 @@ public class QuestionActivityBase extends AppCompatActivity {
     }
     protected void showpoint(Context context) {
         // Log last question attempt if not already logged
-        if (questionStartAt > 0 ) {
-            logAttemptForCurrent();
+        // Wrap in try-catch to prevent crashes that would prevent dialog from showing
+        try {
+            if (questionStartAt > 0 ) {
+                logAttemptForCurrent();
+            }
+        } catch (Exception e) {
+            Log.e("QuestionActivityBase", "Error logging last question attempt", e);
+            // Continue to show results dialog even if logging fails
         }
         
         AlertDialog.Builder builder1=new AlertDialog.Builder(context);
@@ -426,86 +437,213 @@ public class QuestionActivityBase extends AppCompatActivity {
             }
         }
         msg=String.valueOf(truecnt)+msg;
+        String status = "Đỗ";  // Default status
         if(id.equals("level")){
             msg+="\n";
             msg+="Thời gian: "+getTimeTest();
             msg+="\n";
             msg+="Trạng thái: ";
-            if(truecnt<min) state="Trượt";
+            // Tính status: Đỗ nếu không sai câu điểm liệt VÀ đúng >= min_required
+            if(numCriticalWrong > 0 || truecnt < min) {
+                state = "Trượt";
+                status = "Trượt";
+            } else {
+                state = "Đỗ";
+                status = "Đỗ";
+            }
             msg+=state;
+        } else {
+            // Practice mode: không có status đỗ/trượt
+            status = null;
         }
         
-        // Save exam session to Firebase
-        Map<String, Object> session = new HashMap<>();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        // Use Firebase UID if available so history/dashboard có thể lọc đúng theo tài khoản đăng nhập
         String userId = (firebaseUser != null ? firebaseUser.getUid() : UserIdentity.getUserId(this));
         long now = System.currentTimeMillis();
-        session.put("session_id", sessionId);
-        session.put("user_id", userId);
-        session.put("started_at_ms", sessionStartAt);  // Renamed from started_at
-        session.put("submitted_at_ms", now);  // Renamed from submitted_at
         long durationMs = now - sessionStartAt;
-        session.put("duration_ms", durationMs);
-        // blueprint_json as Map (preferred) or legacy string format
-        if (id.equals("level") && rule != null && !rule.isEmpty()) {
-            // Normal mock exam using blueprint rule
-            session.put("blueprint_json", buildBlueprintJson());
-        } else if (sessionMode != null && sessionMode.equals("ai_mock_exam") && listQuestion != null) {
-            // AI mock exam: derive blueprint from actual recommended questions
-            HashMap<String, Integer> blueprintAi = new HashMap<>();
-            for (Question q : listQuestion) {
-                String key = String.valueOf(q.getTopic_id());
-                int current = blueprintAi.containsKey(key) ? blueprintAi.get(key) : 0;
-                blueprintAi.put(key, current + 1);
-            }
-            session.put("blueprint_json", blueprintAi);
-        } else {
-            // For practice_topic and AI practice, keep blueprint empty
-            session.put("blueprint_json", new HashMap<String, Integer>());
-        }
-        session.put("score_raw", truecnt);
-        session.put("score_pct", count == 0 ? 0.0 : (truecnt * 100.0) / count);
-        session.put("num_correct", truecnt);
-        session.put("num_incorrect", Math.max(0, count - truecnt));
-        session.put("num_critical_wrong", numCriticalWrong);
-        // Bổ sung metadata cho bài thi theo hạng (level) để History/Leaderboard hiển thị chuẩn
-        if ("level".equals(id)) {
-            session.put("level_id", level);
-            // "name" được truyền từ QuestionActivityLobby
-            String levelName = intent.getStringExtra("name");
-            if (levelName != null) {
-                session.put("level_name", levelName);
-            }
-            session.put("min_required", min);
-            session.put("total_questions", count);
-            // Không lưu tổng thời gian cho phép; History sẽ dùng duration_ms để tính thời gian thực tế
-        }
-        analyticsRepository.upsertExamSession(session);
-        firestoreService.saveExamSession(session);
         
-        builder1.setMessage(msg);
+        // Tách riêng: exam_session chỉ cho thi thử (level), practice_session cho luyện tập (topic)
+        // Wrap database operations in try-catch to prevent crashes that would prevent dialog from showing
+        String firestoreError = null;
+        try {
+            // Check authentication for Firestore
+            if (firebaseUser == null || firebaseUser.isAnonymous()) {
+                Log.w("QuestionActivityBase", "User not authenticated or anonymous - Firestore save may fail");
+                firestoreError = "Chưa đăng nhập - không thể lưu lịch sử lên Firebase";
+            }
+            
+            if (id.equals("level")) {
+                // THI THỬ: Lưu vào exam_sessions
+                Map<String, Object> examSession = new HashMap<>();
+                examSession.put("session_id", sessionId);
+                examSession.put("user_id", userId);
+                examSession.put("started_at_ms", sessionStartAt);
+                examSession.put("submitted_at_ms", now);
+                examSession.put("duration_ms", durationMs);
+                
+                // blueprint_json
+                if (rule != null && !rule.isEmpty()) {
+                    examSession.put("blueprint_json", buildBlueprintJson());
+                } else if (sessionMode != null && sessionMode.equals("ai_mock_exam") && listQuestion != null) {
+                    HashMap<String, Integer> blueprintAi = new HashMap<>();
+                    for (Question q : listQuestion) {
+                        String key = String.valueOf(q.getTopic_id());
+                        int current = blueprintAi.containsKey(key) ? blueprintAi.get(key) : 0;
+                        blueprintAi.put(key, current + 1);
+                    }
+                    examSession.put("blueprint_json", blueprintAi);
+                } else {
+                    examSession.put("blueprint_json", new HashMap<String, Integer>());
+                }
+                
+                examSession.put("score_raw", truecnt);
+                examSession.put("score_pct", count == 0 ? 0.0 : (truecnt * 100.0) / count);
+                examSession.put("num_correct", truecnt);
+                examSession.put("num_incorrect", Math.max(0, count - truecnt));
+                examSession.put("num_critical_wrong", numCriticalWrong);
+                examSession.put("status", status);  // "Đỗ" or "Trượt"
+                examSession.put("level_id", level);
+                String levelName = intent.getStringExtra("name");
+                if (levelName != null) {
+                    examSession.put("level_name", levelName);
+                }
+                examSession.put("min_required", min);
+                examSession.put("total_questions", count);
+                
+                // Save to local database first (this should always work)
+                try {
+                    analyticsRepository.upsertExamSession(examSession);
+                    Log.d("QuestionActivityBase", "Exam session saved to local database successfully");
+                } catch (Exception dbError) {
+                    Log.e("QuestionActivityBase", "Error saving to local database", dbError);
+                }
+                
+                // Save to Firestore (may fail if not authenticated or rules don't allow)
+                if (firebaseUser != null && !firebaseUser.isAnonymous()) {
+                    firestoreService.saveExamSession(examSession).addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("QuestionActivityBase", "Firestore save failed: " + e.getMessage(), e);
+                            String errorMsg = "Không lưu được lịch sử lên Firebase: " + e.getMessage();
+                            // Show toast on main thread
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(QuestionActivityBase.this, errorMsg, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    firestoreError = "Cần đăng nhập để lưu lịch sử lên Firebase";
+                }
+            } else {
+                // LUYỆN TẬP: Lưu vào practice_sessions
+                Map<String, Object> practiceSession = new HashMap<>();
+                practiceSession.put("session_id", sessionId);
+                practiceSession.put("user_id", userId);
+                practiceSession.put("started_at_ms", sessionStartAt);
+                practiceSession.put("submitted_at_ms", now);
+                practiceSession.put("duration_ms", durationMs);
+                practiceSession.put("score_raw", truecnt);
+                practiceSession.put("score_pct", count == 0 ? 0.0 : (truecnt * 100.0) / count);
+                practiceSession.put("num_correct", truecnt);
+                practiceSession.put("num_incorrect", Math.max(0, count - truecnt));
+                practiceSession.put("num_critical_wrong", numCriticalWrong);
+                
+                // Practice mode metadata
+                if (id.equals("topic")) {
+                    practiceSession.put("topic_id", topicid);
+                    // Có thể lấy tên topic từ database nếu cần
+                    practiceSession.put("start_question", start);
+                    practiceSession.put("end_question", end);
+                    practiceSession.put("total_questions", count);
+                    String mode = (sessionMode != null && !sessionMode.isEmpty()) ? sessionMode : "practice_topic";
+                    practiceSession.put("mode", mode);
+                }
+                
+                // Save to local database first
+                try {
+                    analyticsRepository.upsertPracticeSession(practiceSession);
+                    Log.d("QuestionActivityBase", "Practice session saved to local database successfully");
+                } catch (Exception dbError) {
+                    Log.e("QuestionActivityBase", "Error saving to local database", dbError);
+                }
+                
+                // Save to Firestore
+                if (firebaseUser != null && !firebaseUser.isAnonymous()) {
+                    firestoreService.savePracticeSession(practiceSession).addOnFailureListener(new com.google.android.gms.tasks.OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("QuestionActivityBase", "Firestore save failed: " + e.getMessage(), e);
+                            String errorMsg = "Không lưu được lịch sử lên Firebase: " + e.getMessage();
+                            // Show toast on main thread
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(QuestionActivityBase.this, errorMsg, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    firestoreError = "Cần đăng nhập để lưu lịch sử lên Firebase";
+                }
+            }
+        } catch (Exception e) {
+            // Log error but don't crash - still show results dialog to user
+            Log.e("QuestionActivityBase", "Error saving session to database/Firestore", e);
+            firestoreError = "Lỗi: " + e.getMessage();
+        }
+        
+        // Store error message to show in dialog if needed
+        final String finalFirestoreError = firestoreError;
+        
+        // Add Firestore error message to dialog if there was an error
+        String dialogMessage = msg;
+        if (finalFirestoreError != null) {
+            dialogMessage += "\n\n⚠️ " + finalFirestoreError;
+        }
+        
+        builder1.setMessage(dialogMessage);
         builder1.setNegativeButton("Thoát", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                // Finish activity and return to previous screen
                 finish();
             }
         });
         builder1.setPositiveButton("Xem lại bài làm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Intent nextIntent=new Intent(context,QuestionActivityReview.class);
-                nextIntent.putParcelableArrayListExtra("listQuestion",listQuestion);
-                nextIntent.putExtra("result",msg);
-                nextIntent.putExtra("startTime",startTime);
-                nextIntent.putExtra("endTime",endTime);
-                nextIntent.putExtra("time",getTimeTest());
-                startActivity(nextIntent);
-                finish();
+                // Navigate to review screen
+                try {
+                    Intent nextIntent=new Intent(QuestionActivityBase.this,QuestionActivityReview.class);
+                    nextIntent.putParcelableArrayListExtra("listQuestion",listQuestion);
+                    nextIntent.putExtra("result",msg);
+                    nextIntent.putExtra("startTime",startTime);
+                    nextIntent.putExtra("endTime",endTime);
+                    nextIntent.putExtra("time",getTimeTest());
+                    startActivity(nextIntent);
+                    // Only finish after successfully starting the review activity
+                    finish();
+                } catch (Exception e) {
+                    Log.e("QuestionActivityBase", "Error navigating to review screen", e);
+                    Toast.makeText(QuestionActivityBase.this, "Lỗi khi mở màn hình xem lại", Toast.LENGTH_SHORT).show();
+                    // Don't finish if navigation fails - let user try again or exit manually
+                }
             }
         });
-        AlertDialog alertDialog=builder1.create();
-        alertDialog.show();
+        
+        // Ensure dialog is shown even if there were errors
+        try {
+            AlertDialog alertDialog=builder1.create();
+            alertDialog.show();
+        } catch (Exception e) {
+            Log.e("QuestionActivityBase", "Error showing results dialog", e);
+            // Fallback: show toast and finish
+            Toast.makeText(this, "Kết quả: " + msg, Toast.LENGTH_LONG).show();
+        }
     }
     private String getTimeTest() {
         String ans="";

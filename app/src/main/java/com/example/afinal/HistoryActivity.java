@@ -93,24 +93,31 @@ public class HistoryActivity extends BaseNavigationActivity {
             int minRequired = minRequiredLong != null ? minRequiredLong.intValue() : -1;
             int totalQuestions = totalQuestionsLong != null ? totalQuestionsLong.intValue() : 0;
 
-            // Tên bài thi / hạng
+            // Tên bài thi / hạng - ưu tiên level_name từ Firestore
             String levelName = doc.getString("level_name");
             Long levelId = doc.getLong("level_id");
             String examLabel;
             if (levelName != null && !levelName.isEmpty()) {
-                examLabel = "Hạng " + levelName;
+                examLabel = "Hạng " + levelName;  // Hiển thị "Hạng B", "Hạng C1", etc.
             } else if (levelId != null) {
                 examLabel = "Hạng " + levelId;
             } else {
-                examLabel = "Bài thi";
+                examLabel = "Bài thi";  // Fallback nếu không có level info
             }
 
-            // Trạng thái: nếu có min_required thì áp dụng đúng rule đỗ/trượt
+            // Trạng thái: ưu tiên dùng field "status" từ Firestore, nếu không có thì tính lại
             boolean passed;
-            if (minRequired > 0) {
-                passed = criticalWrong == 0 && score >= minRequired;
+            String statusFromDb = doc.getString("status");
+            if (statusFromDb != null) {
+                // Dùng status từ database: "Đỗ" = true, "Trượt" = false
+                passed = "Đỗ".equals(statusFromDb);
             } else {
-                passed = criticalWrong == 0;
+                // Fallback: tính lại từ logic cũ (backward compatibility)
+                if (minRequired > 0) {
+                    passed = criticalWrong == 0 && score >= minRequired;
+                } else {
+                    passed = criticalWrong == 0;
+                }
             }
 
             long submittedVal = (submittedAt != null ? submittedAt : 0L);
